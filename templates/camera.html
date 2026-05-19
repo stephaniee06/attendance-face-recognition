@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face Recognition</title>
+</head>
+
+<body>
+
+<h1>Face Recognition</h1>
+
+<video
+id="video"
+width="640"
+height="480"
+autoplay
+playsinline
+style="
+border:2px solid black;
+transform: scaleX(-1);
+"
+>
+</video>
+
+<br><br>
+
+<h3>Tambah User Baru</h3>
+
+<input
+id="nameInput"
+type="text"
+placeholder="Nama user"
+>
+
+<input
+id="departmentInput"
+type="text"
+placeholder="Departemen"
+>
+
+<button id="addUserBtn">
+Tambah User
+</button>
+
+<br><br>
+
+<label>Pilih User:</label>
+
+<select id="userSelect">
+</select>
+
+<br><br>
+
+<button id="registerBtn">
+Register Face
+</button>
+
+<button id="recognizeBtn">
+Recognize
+</button>
+
+<script>
+const video = document.getElementById("video");
+
+const nameInput = document.getElementById("nameInput");
+const departmentInput = document.getElementById("departmentInput");
+const addUserBtn = document.getElementById("addUserBtn");
+
+const userSelect = document.getElementById("userSelect");
+const registerBtn = document.getElementById("registerBtn");
+const recognizeBtn = document.getElementById("recognizeBtn");
+
+navigator.mediaDevices.getUserMedia({
+    video: true
+})
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(error => {
+    alert("Kamera gagal: " + error.message);
+});
+
+async function loadUsers() {
+    const response = await fetch("/api/users");
+    const users = await response.json();
+
+    userSelect.innerHTML = "";
+
+    users.forEach(user => {
+        const option = document.createElement("option");
+        option.value = user.id;
+        option.textContent = user.name;
+        userSelect.appendChild(option);
+    });
+}
+
+addUserBtn.addEventListener("click", async () => {
+    const name = nameInput.value;
+    const department = departmentInput.value;
+
+    if (!name) {
+        alert("Nama wajib diisi");
+        return;
+    }
+
+    const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            department: department
+        })
+    });
+
+    const data = await response.json();
+
+    alert("User dibuat: " + data.name);
+
+    nameInput.value = "";
+    departmentInput.value = "";
+
+    await loadUsers();
+});
+
+function captureImage() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 480;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.translate(640, 0);
+    ctx.scale(-1, 1);
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        640,
+        480
+    );
+
+    return canvas.toDataURL("image/jpeg");
+}
+
+registerBtn.addEventListener("click", async () => {
+    const image = captureImage();
+
+    const response = await fetch("/api/register-face", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: parseInt(userSelect.value),
+            image: image
+        })
+    });
+
+    const data = await response.json();
+
+    alert(JSON.stringify(data));
+});
+
+recognizeBtn.addEventListener("click", async () => {
+    const image = captureImage();
+
+    const response = await fetch("/api/recognize", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            image: image
+        })
+    });
+
+    const data = await response.json();
+
+    alert(JSON.stringify(data));
+});
+
+loadUsers();
+</script>
+
+</body>
+</html>

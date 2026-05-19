@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+
+dataset/
+instance/
+
+model/lbph_model.yml
+
+*.db
+*.pyc
