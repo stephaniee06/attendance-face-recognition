@@ -3,14 +3,46 @@ import cv2
 import numpy as np
 
 from config import Config
+from face_engine.detector import detect_faces
 
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 
+def prepare_training_face(image_path):
+    image = cv2.imread(image_path)
+
+    if image is None:
+        return None
+
+    faces, gray = detect_faces(image)
+
+    if len(faces) > 0:
+        x, y, w, h = max(
+            faces,
+            key=lambda face: face[2] * face[3]
+        )
+
+        face = gray[y:y+h, x:x+w]
+    else:
+        face = cv2.imread(
+            image_path,
+            cv2.IMREAD_GRAYSCALE
+        )
+
+    if face is None:
+        return None
+
+    return cv2.resize(
+        face,
+        Config.FACE_SIZE
+    )
+
+
 def train_model():
     faces = []
     labels = []
+    skipped = 0
 
     for folder_name in os.listdir(Config.DATASET_DIR):
         user_folder = os.path.join(
@@ -34,18 +66,11 @@ def train_model():
                 filename
             )
 
-            image = cv2.imread(
-                image_path,
-                cv2.IMREAD_GRAYSCALE
-            )
+            image = prepare_training_face(image_path)
 
             if image is None:
+                skipped += 1
                 continue
-
-            image = cv2.resize(
-                image,
-                Config.FACE_SIZE
-            )
 
             faces.append(image)
             labels.append(user_id)
@@ -67,7 +92,10 @@ def train_model():
         Config.MODEL_PATH
     )
 
-    return True, "Model berhasil dilatih"
+    return True, (
+        f"Model berhasil dilatih dengan {len(faces)} foto"
+        f" ({skipped} foto dilewati)"
+    )
 
 
 def predict_face(gray_face):
