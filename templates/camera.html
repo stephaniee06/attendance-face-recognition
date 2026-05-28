@@ -1,62 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Face Recognition</title>
+    <meta charset="UTF-8">
+    <title>Face Attendance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .alert-slide {
+            animation: slideIn 0.35s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
 </head>
 
-<body>
+<body class="min-h-screen bg-[#f7f4ef] text-[#1f1f1f]">
 
-<h1>Face Recognition</h1>
+<header class="h-16 bg-white border-b flex items-center justify-center shadow-sm">
+    <h1 class="text-2xl font-bold text-[#735c00]">
+        Face Attendance System
+    </h1>
+</header>
 
-<video
-id="video"
-width="640"
-height="480"
-autoplay
-playsinline
-style="
-border:2px solid black;
-transform: scaleX(-1);
-"
->
-</video>
+<div id="alertContainer" class="fixed top-5 right-5 z-50 space-y-3"></div>
 
-<br><br>
+<main class="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-<h3>Tambah User Baru</h3>
+    <section class="bg-white p-5 rounded-2xl shadow">
+        <h2 class="text-xl font-semibold mb-4">Camera</h2>
 
-<input
-id="nameInput"
-type="text"
-placeholder="Nama user"
->
+        <video
+            id="video"
+            width="640"
+            height="480"
+            autoplay
+            playsinline
+            class="w-full rounded-xl border-4 border-[#d4af37]"
+            style="transform: scaleX(-1);"
+        ></video>
 
-<input
-id="departmentInput"
-type="text"
-placeholder="Departemen"
->
+        <p id="resultText" class="mt-4 p-3 rounded-lg bg-[#f1ead7] text-sm">
+            Result: -
+        </p>
+    </section>
 
-<button id="addUserBtn">
-Tambah User
-</button>
+    <section class="space-y-6">
 
-<br><br>
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h2 class="text-xl font-semibold mb-4">Tambah User Baru</h2>
 
-<label>Pilih User:</label>
+            <input
+                id="nameInput"
+                type="text"
+                placeholder="Nama user"
+                class="w-full mb-3 px-4 py-3 border rounded-lg"
+            >
 
-<select id="userSelect">
-</select>
+            <input
+                id="departmentInput"
+                type="text"
+                placeholder="Departemen"
+                class="w-full mb-4 px-4 py-3 border rounded-lg"
+            >
 
-<br><br>
+            <button
+                id="addUserBtn"
+                class="w-full bg-[#735c00] text-white py-3 rounded-lg font-semibold transition-transform duration-200 shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
+            >
+                Tambah User
+            </button>
+        </div>
 
-<button id="registerBtn">
-Register Face
-</button>
+        <div class="bg-white p-5 rounded-2xl shadow">
+            <h2 class="text-xl font-semibold mb-4">Face Action</h2>
 
-<button id="recognizeBtn">
-Recognize
-</button>
+            <label class="block mb-2 font-medium">Pilih User:</label>
+
+            <select
+                id="userSelect"
+                class="w-full mb-4 px-4 py-3 border rounded-lg"
+            ></select>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button
+                    id="registerBtn"
+                    class="border-2 border-[#735c00] text-[#735c00] py-3 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#735c00] hover:text-white active:scale-95"
+                >
+                    Register Face
+                </button>
+
+                <button
+                    id="recognizeBtn"
+                    class="bg-[#d4af37] text-black py-3 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#c69f1e] active:scale-95"
+                >
+                    Recognize
+                </button>
+            </div>
+        </div>
+
+    </section>
+
+</main>
 
 <script>
 const video = document.getElementById("video");
@@ -68,6 +114,7 @@ const addUserBtn = document.getElementById("addUserBtn");
 const userSelect = document.getElementById("userSelect");
 const registerBtn = document.getElementById("registerBtn");
 const recognizeBtn = document.getElementById("recognizeBtn");
+const resultText = document.getElementById("resultText");
 
 navigator.mediaDevices.getUserMedia({
     video: true
@@ -76,8 +123,26 @@ navigator.mediaDevices.getUserMedia({
     video.srcObject = stream;
 })
 .catch(error => {
-    alert("Kamera gagal: " + error.message);
+    showAlert("Kamera gagal: " + error.message, "error");
 });
+
+function showAlert(message, type = "success") {
+    const container = document.getElementById("alertContainer");
+    const alert = document.createElement("div");
+    alert.className = `alert-slide max-w-sm rounded-xl border px-4 py-3 shadow-lg transition-opacity duration-300 ${type === "error" ? "border-red-300 bg-red-50 text-red-700" : "border-green-300 bg-green-50 text-green-700"}`;
+    alert.textContent = message;
+
+    container.appendChild(alert);
+
+    setTimeout(() => {
+        alert.style.opacity = "0";
+        alert.style.transform = "translateX(20px)";
+    }, 3500);
+
+    setTimeout(() => {
+        container.removeChild(alert);
+    }, 4000);
+}
 
 async function loadUsers() {
     const response = await fetch("/api/users");
@@ -98,7 +163,7 @@ addUserBtn.addEventListener("click", async () => {
     const department = departmentInput.value;
 
     if (!name) {
-        alert("Nama wajib diisi");
+        showAlert("Nama wajib diisi", "error");
         return;
     }
 
@@ -115,7 +180,7 @@ addUserBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    alert("User dibuat: " + data.name);
+    showAlert("User dibuat: " + data.name, "success");
 
     nameInput.value = "";
     departmentInput.value = "";
@@ -133,13 +198,7 @@ function captureImage() {
     ctx.translate(640, 0);
     ctx.scale(-1, 1);
 
-    ctx.drawImage(
-        video,
-        0,
-        0,
-        640,
-        480
-    );
+    ctx.drawImage(video, 0, 0, 640, 480);
 
     return canvas.toDataURL("image/jpeg");
 }
@@ -160,10 +219,10 @@ registerBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    alert(JSON.stringify(data));
+    showAlert(JSON.stringify(data), "success");
 });
 
-recognizeBtn.addEventListener("click", async () => {
+async function recognizeFace() {
     const image = captureImage();
 
     const response = await fetch("/api/recognize", {
@@ -178,8 +237,31 @@ recognizeBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    alert(JSON.stringify(data));
+    resultText.textContent = "Result: " + JSON.stringify(data);
+
+    showAlert(JSON.stringify(data), "success");
+
+    return data;
+}
+
+recognizeBtn.addEventListener("click", async () => {
+    await recognizeFace();
 });
+
+
+// REALTIME MODE NANTI
+// Kalau mau otomatis tanpa tombol, uncomment ini:
+
+// let isRecognizing = false;
+
+// setInterval(async () => {
+//     if (isRecognizing) return;
+
+//     isRecognizing = true;
+//     await recognizeFace();
+//     isRecognizing = false;
+// }, 2000);
+
 
 loadUsers();
 </script>

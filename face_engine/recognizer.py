@@ -117,3 +117,7 @@ def predict_face(gray_face):
         return int(label), round(confidence, 2), "recognized"
 
     return None, round(confidence, 2), "unknown"
+
+if __name__ == "__main__":
+    success, message = train_model()
+    print(message)
