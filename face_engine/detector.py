@@ -23,11 +23,9 @@ def detect_faces(frame):
 
     return faces, gray
 
-
 def decode_base64_frame(
     base64_string
 ):
-
     image_data = base64.b64decode(
         base64_string.split(",")[1]
     )

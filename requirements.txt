@@ -1,0 +1,5 @@
+Flask>=2.0
+Flask-Cors>=3.0
+Flask-SQLAlchemy>=3.0
+numpy>=1.21
+opencv-contrib-python>=4.5

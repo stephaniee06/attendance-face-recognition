@@ -18,7 +18,7 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    return "Backend Face Attendance berhasil jalan"
+    return "Backend Face Attendance System is running. Access the camera interface at /camera"
 
 @app.route("/camera")
 def camera():

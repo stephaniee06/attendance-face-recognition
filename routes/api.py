@@ -1,4 +1,5 @@
 import os
+import shutil
 import cv2
 
 from flask import Blueprint, request, jsonify
@@ -43,7 +44,7 @@ def create_user():
     )
 
     return jsonify({
-        "message": "User berhasil dibuat",
+        "message": "User created successfully",
         "user_id": user.id,
         "name": user.name,
         "dataset_folder": user_folder
@@ -56,17 +57,66 @@ def get_users():
     result = []
 
     for user in users:
+        user_folder = get_user_dataset_folder(user)
+        face_count = 0
+        if os.path.exists(user_folder):
+            face_count = len([
+                f for f in os.listdir(user_folder)
+                if f.lower().endswith(('.jpg', '.jpeg', '.png'))
+            ])
+
         result.append({
             "id": user.id,
             "name": user.name,
-            "department": user.department
+            "department": user.department,
+            "face_count": face_count
         })
 
     return jsonify(result)
 
+
+@api.route("/users/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+
+    if user is None:
+        return jsonify({
+            "success": False,
+            "message": "User not found"
+        }), 404
+
+    deleted_attendance = Attendance.query.filter_by(user_id=user_id).delete()
+
+    # Delete dataset folder
+    user_folder = get_user_dataset_folder(user)
+    folder_deleted = False
+    if os.path.exists(user_folder):
+        shutil.rmtree(user_folder)
+        folder_deleted = True
+
+    user_name = user.name
+
+    db.session.delete(user)
+    db.session.commit()
+
+    print(f"[API delete] Deleted user '{user_name}' (ID: {user_id}), "
+          f"{deleted_attendance} attendance records, "
+          f"folder deleted: {folder_deleted}")
+
+    return jsonify({
+        "success": True,
+        "message": f"User '{user_name}' deleted successfully",
+        "deleted_attendance": deleted_attendance,
+        "folder_deleted": folder_deleted
+    })
+
+
 @api.route("/train", methods=["POST"])
 def train():
-    success, message = train_model()
+    valid_user_ids = [u.id for u in User.query.all()]
+    print(f"[API train] Starting training with {len(valid_user_ids)} registered users")
+
+    success, message = train_model(valid_user_ids=valid_user_ids)
 
     return jsonify({
         "success": success,
@@ -86,7 +136,7 @@ def register_face():
     if user is None:
         return jsonify({
             "success": False,
-            "message": "User tidak ditemukan"
+            "message": "User not found"
         })
 
     frame = decode_base64_frame(image)
@@ -95,7 +145,7 @@ def register_face():
     if len(faces) == 0:
         return jsonify({
             "success": False,
-            "message": "Tidak ada wajah"
+            "message": "No face detected"
         })
 
     x, y, w, h = faces[0]
@@ -130,10 +180,16 @@ def register_face():
         ]
     )
 
+    face_count = len([
+        f for f in os.listdir(user_folder)
+        if f.lower().endswith(('.jpg', '.jpeg', '.png'))
+    ])
+
     return jsonify({
         "success": True,
         "user_id": user.id,
         "name": user.name,
+        "face_count": face_count,
         "file": filename
     })
 
@@ -149,7 +205,7 @@ def recognize():
     if len(faces) == 0:
         return jsonify({
             "status": "no_face",
-            "message": "Tidak ada wajah"
+            "message": "No face detected"
         })
 
     x, y, w, h = faces[0]
@@ -162,9 +218,10 @@ def recognize():
         user = User.query.get(user_id)
 
         if user is None:
+            print(f"[API recognize] Face predicted as ID {user_id}, but ID not found in database.")
             return jsonify({
                 "status": "unknown",
-                "message": "User tidak ditemukan di database",
+                "message": "User not found in database",
                 "confidence": confidence
             })
 
@@ -172,6 +229,7 @@ def recognize():
         db.session.add(attendance)
         db.session.commit()
 
+        print(f"[API recognize] Recognized: {user.name} (ID: {user.id}) | Confidence: {confidence}")
         return jsonify({
             "status": "recognized",
             "user_id": user.id,
@@ -179,6 +237,7 @@ def recognize():
             "confidence": confidence
         })
 
+    print(f"[API recognize] Unknown face | Distance/Confidence: {confidence}")
     return jsonify({
         "status": "unknown",
         "confidence": confidence

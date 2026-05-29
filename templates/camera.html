@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Attendance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -10,261 +12,420 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
 
 <body class="min-h-screen bg-[#f7f4ef] text-[#1f1f1f]">
 
-<header class="h-16 bg-white border-b flex items-center justify-center shadow-sm">
-    <h1 class="text-2xl font-bold text-[#735c00]">
-        Face Attendance System
-    </h1>
-</header>
+    <header class="h-16 bg-white border-b flex items-center justify-center shadow-sm">
+        <h1 class="text-2xl font-bold text-[#735c00]">
+            Face Attendance System
+        </h1>
+    </header>
 
-<div id="alertContainer" class="fixed top-5 right-5 z-50 space-y-3"></div>
+    <div id="alertContainer" class="fixed top-5 right-5 z-50 space-y-3"></div>
 
-<main class="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <main class="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section class="bg-white p-5 rounded-2xl shadow">
+            <h2 class="text-xl font-semibold mb-4">Camera</h2>
 
-    <section class="bg-white p-5 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold mb-4">Camera</h2>
+            <video
+                id="video"
+                width="640"
+                height="480"
+                autoplay
+                playsinline
+                class="w-full rounded-xl border-4 border-[#d4af37]"
+                style="transform: scaleX(-1);"
+            ></video>
 
-        <video
-            id="video"
-            width="640"
-            height="480"
-            autoplay
-            playsinline
-            class="w-full rounded-xl border-4 border-[#d4af37]"
-            style="transform: scaleX(-1);"
-        ></video>
+            <div id="resultPanel" class="mt-4 p-3 rounded-lg bg-[#f1ead7] text-sm">
+                <span class="text-gray-500">Click "Recognize" for face recognition</span>
+            </div>
+        </section>
 
-        <p id="resultText" class="mt-4 p-3 rounded-lg bg-[#f1ead7] text-sm">
-            Result: -
-        </p>
-    </section>
+        <section class="space-y-6">
 
-    <section class="space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow">
+                <h2 class="text-xl font-semibold mb-4">Register User</h2>
 
-        <div class="bg-white p-5 rounded-2xl shadow">
-            <h2 class="text-xl font-semibold mb-4">Tambah User Baru</h2>
+                <p class="text-sm font-semibold text-gray-600 mb-2">Add User</p>
 
-            <input
-                id="nameInput"
-                type="text"
-                placeholder="Nama user"
-                class="w-full mb-3 px-4 py-3 border rounded-lg"
-            >
+                <input id="nameInput" type="text" placeholder="Full Name"
+                    class="w-full mb-3 px-4 py-3 border rounded-lg">
 
-            <input
-                id="departmentInput"
-                type="text"
-                placeholder="Departemen"
-                class="w-full mb-4 px-4 py-3 border rounded-lg"
-            >
+                <input id="departmentInput" type="text" placeholder="Department (optional)"
+                    class="w-full mb-4 px-4 py-3 border rounded-lg">
 
-            <button
-                id="addUserBtn"
-                class="w-full bg-[#735c00] text-white py-3 rounded-lg font-semibold transition-transform duration-200 shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
-            >
-                Tambah User
-            </button>
-        </div>
-
-        <div class="bg-white p-5 rounded-2xl shadow">
-            <h2 class="text-xl font-semibold mb-4">Face Action</h2>
-
-            <label class="block mb-2 font-medium">Pilih User:</label>
-
-            <select
-                id="userSelect"
-                class="w-full mb-4 px-4 py-3 border rounded-lg"
-            ></select>
-
-            <div class="grid grid-cols-2 gap-3">
-                <button
-                    id="registerBtn"
-                    class="border-2 border-[#735c00] text-[#735c00] py-3 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#735c00] hover:text-white active:scale-95"
-                >
-                    Register Face
+                <button id="addUserBtn"
+                    class="w-full bg-[#735c00] text-white py-3 rounded-lg font-semibold transition-transform duration-200 shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-95">
+                    Add User
                 </button>
 
-                <button
-                    id="recognizeBtn"
-                    class="bg-[#d4af37] text-black py-3 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#c69f1e] active:scale-95"
-                >
+                <hr class="my-5 border-gray-200">
+
+                <p class="text-sm font-semibold text-gray-600 mb-2">Capture Faces</p>
+
+                <label class="block mb-2 font-medium">Select User:</label>
+
+                <div class="flex gap-2 mb-2">
+                    <select id="userSelect" class="flex-1 px-4 py-3 border rounded-lg"></select>
+
+                    <button id="deleteUserBtn"
+                        class="px-4 py-3 border-2 border-red-400 text-red-500 rounded-lg font-semibold text-sm transition-transform duration-200 hover:-translate-y-0.5 hover:bg-red-500 hover:text-white active:scale-95"
+                        title="Delete user">
+                        Delete
+                    </button>
+                </div>
+
+                <p class="text-sm text-gray-500 mb-3">
+                    Photo Saved: <span id="faceCount" class="font-bold text-[#735c00]">0</span>
+                </p>
+
+                <button id="registerBtn"
+                    class="w-full border-2 border-[#735c00] text-[#735c00] py-3 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#735c00] hover:text-white active:scale-95">
+                    Capture Faces
+                </button>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow">
+                <h2 class="text-xl font-semibold mb-4">Recognize</h2>
+
+                <button id="recognizeBtn"
+                    class="w-full bg-[#d4af37] text-black py-4 rounded-lg font-semibold text-lg transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#c69f1e] active:scale-95">
                     Recognize
+                </button>
+
+                <p class="text-xs text-gray-400 text-center mt-2">
+                    Recognize faces without needing to select a user
+                </p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow flex items-center justify-between gap-4">
+                <p class="text-sm text-gray-500" id="trainInfo">
+                    Retrain the model after adding/removing faces.
+                </p>
+                <button id="trainBtn"
+                    class="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold text-sm whitespace-nowrap transition-transform duration-200 hover:-translate-y-0.5 hover:bg-green-700 active:scale-95">
+                    Train Model
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="confirmOverlay" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+        style="display:none;">
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-[90%]">
+            <h3 id="confirmTitle" class="text-lg font-bold mb-2">Confirm</h3>
+            <p id="confirmMessage" class="text-sm text-gray-600 mb-5">Are you sure?</p>
+            <div class="flex gap-3 justify-end">
+                <button id="confirmCancel" class="px-4 py-2 border rounded-lg text-sm font-semibold hover:bg-gray-100">
+                    Cancel
+                </button>
+                <button id="confirmOk"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600">
+                    Delete
                 </button>
             </div>
         </div>
+    </div>
 
-    </section>
-
-</main>
-
-<script>
-const video = document.getElementById("video");
-
-const nameInput = document.getElementById("nameInput");
-const departmentInput = document.getElementById("departmentInput");
-const addUserBtn = document.getElementById("addUserBtn");
-
-const userSelect = document.getElementById("userSelect");
-const registerBtn = document.getElementById("registerBtn");
-const recognizeBtn = document.getElementById("recognizeBtn");
-const resultText = document.getElementById("resultText");
-
-navigator.mediaDevices.getUserMedia({
-    video: true
-})
-.then(stream => {
-    video.srcObject = stream;
-})
-.catch(error => {
-    showAlert("Kamera gagal: " + error.message, "error");
-});
-
-function showAlert(message, type = "success") {
-    const container = document.getElementById("alertContainer");
-    const alert = document.createElement("div");
-    alert.className = `alert-slide max-w-sm rounded-xl border px-4 py-3 shadow-lg transition-opacity duration-300 ${type === "error" ? "border-red-300 bg-red-50 text-red-700" : "border-green-300 bg-green-50 text-green-700"}`;
-    alert.textContent = message;
-
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.opacity = "0";
-        alert.style.transform = "translateX(20px)";
-    }, 3500);
-
-    setTimeout(() => {
-        container.removeChild(alert);
-    }, 4000);
-}
-
-async function loadUsers() {
-    const response = await fetch("/api/users");
-    const users = await response.json();
-
-    userSelect.innerHTML = "";
-
-    users.forEach(user => {
-        const option = document.createElement("option");
-        option.value = user.id;
-        option.textContent = user.name;
-        userSelect.appendChild(option);
-    });
-}
-
-addUserBtn.addEventListener("click", async () => {
-    const name = nameInput.value;
-    const department = departmentInput.value;
-
-    if (!name) {
-        showAlert("Nama wajib diisi", "error");
-        return;
-    }
-
-    const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            name: name,
-            department: department
-        })
-    });
-
-    const data = await response.json();
-
-    showAlert("User dibuat: " + data.name, "success");
-
-    nameInput.value = "";
-    departmentInput.value = "";
-
-    await loadUsers();
-});
-
-function captureImage() {
-    const canvas = document.createElement("canvas");
-    canvas.width = 640;
-    canvas.height = 480;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.translate(640, 0);
-    ctx.scale(-1, 1);
-
-    ctx.drawImage(video, 0, 0, 640, 480);
-
-    return canvas.toDataURL("image/jpeg");
-}
-
-registerBtn.addEventListener("click", async () => {
-    const image = captureImage();
-
-    const response = await fetch("/api/register-face", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            user_id: parseInt(userSelect.value),
-            image: image
-        })
-    });
-
-    const data = await response.json();
-
-    showAlert(JSON.stringify(data), "success");
-});
-
-async function recognizeFace() {
-    const image = captureImage();
-
-    const response = await fetch("/api/recognize", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            image: image
-        })
-    });
-
-    const data = await response.json();
-
-    resultText.textContent = "Result: " + JSON.stringify(data);
-
-    showAlert(JSON.stringify(data), "success");
-
-    return data;
-}
-
-recognizeBtn.addEventListener("click", async () => {
-    await recognizeFace();
-});
+    <script>
+        const video = document.getElementById("video");
+        const nameInput = document.getElementById("nameInput");
+        const departmentInput = document.getElementById("departmentInput");
+        const addUserBtn = document.getElementById("addUserBtn");
+        const userSelect = document.getElementById("userSelect");
+        const deleteUserBtn = document.getElementById("deleteUserBtn");
+        const registerBtn = document.getElementById("registerBtn");
+        const recognizeBtn = document.getElementById("recognizeBtn");
+        const trainBtn = document.getElementById("trainBtn");
+        const resultPanel = document.getElementById("resultPanel");
+        const faceCountEl = document.getElementById("faceCount");
+        const trainInfo = document.getElementById("trainInfo");
 
 
-// REALTIME MODE NANTI
-// Kalau mau otomatis tanpa tombol, uncomment ini:
-
-// let isRecognizing = false;
-
-// setInterval(async () => {
-//     if (isRecognizing) return;
-
-//     isRecognizing = true;
-//     await recognizeFace();
-//     isRecognizing = false;
-// }, 2000);
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => showAlert("Kamera gagal: " + err.message, "error"));
 
 
-loadUsers();
-</script>
+        function showAlert(message, type = "success") {
+            const container = document.getElementById("alertContainer");
+            const alert = document.createElement("div");
+            alert.className = `alert-slide max-w-sm rounded-xl border px-4 py-3 shadow-lg transition-opacity duration-300 ${type === "error" ? "border-red-300 bg-red-50 text-red-700" : "border-green-300 bg-green-50 text-green-700"}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => { alert.style.opacity = "0"; alert.style.transform = "translateX(20px)"; }, 3500);
+            setTimeout(() => { container.removeChild(alert); }, 4000);
+        }
+
+        function showConfirm(title, message) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById("confirmOverlay");
+                document.getElementById("confirmTitle").textContent = title;
+                document.getElementById("confirmMessage").textContent = message;
+                overlay.style.display = "flex";
+
+                const onOk = () => { cleanup(); resolve(true); };
+                const onCancel = () => { cleanup(); resolve(false); };
+                const cleanup = () => {
+                    overlay.style.display = "none";
+                    document.getElementById("confirmOk").removeEventListener("click", onOk);
+                    document.getElementById("confirmCancel").removeEventListener("click", onCancel);
+                };
+
+                document.getElementById("confirmOk").addEventListener("click", onOk);
+                document.getElementById("confirmCancel").addEventListener("click", onCancel);
+            });
+        }
+
+
+        function captureImage() {
+            const canvas = document.createElement("canvas");
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext("2d");
+            ctx.translate(640, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, 640, 480);
+            return canvas.toDataURL("image/jpeg");
+        }
+
+
+        let usersCache = [];
+
+        async function loadUsers() {
+            try {
+                const res = await fetch("/api/users");
+                usersCache = await res.json();
+            } catch {
+                usersCache = [];
+            }
+
+            userSelect.innerHTML = "";
+
+            if (usersCache.length === 0) {
+                const opt = document.createElement("option");
+                opt.textContent = "No users available";
+                opt.disabled = true;
+                opt.selected = true;
+                userSelect.appendChild(opt);
+                faceCountEl.textContent = "0";
+                return;
+            }
+
+            usersCache.forEach(user => {
+                const option = document.createElement("option");
+                option.value = user.id;
+                option.textContent = user.name;
+                option.dataset.faceCount = user.face_count || 0;
+                userSelect.appendChild(option);
+            });
+
+            updateFaceCount();
+        }
+
+        function updateFaceCount() {
+            const selected = userSelect.options[userSelect.selectedIndex];
+            if (selected && selected.dataset.faceCount !== undefined) {
+                faceCountEl.textContent = selected.dataset.faceCount;
+            } else {
+                faceCountEl.textContent = "0";
+            }
+        }
+
+        userSelect.addEventListener("change", updateFaceCount);
+
+
+        addUserBtn.addEventListener("click", async () => {
+            const name = nameInput.value.trim();
+            const department = departmentInput.value.trim();
+
+            if (!name) {
+                showAlert("Name is required", "error");
+                return;
+            }
+
+            addUserBtn.disabled = true;
+            try {
+                const res = await fetch("/api/users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, department })
+                });
+                const data = await res.json();
+                showAlert("User dibuat: " + data.name, "success");
+                nameInput.value = "";
+                departmentInput.value = "";
+                await loadUsers();
+                userSelect.value = data.user_id;
+                updateFaceCount();
+            } catch (e) {
+                showAlert("Failed to add user", "error");
+            }
+            addUserBtn.disabled = false;
+        });
+
+
+        deleteUserBtn.addEventListener("click", async () => {
+            if (usersCache.length === 0) {
+                showAlert("No users available for deletion", "error");
+                return;
+            }
+
+            const userId = parseInt(userSelect.value);
+            const userName = userSelect.options[userSelect.selectedIndex]?.textContent || "";
+
+            const confirmed = await showConfirm(
+                "Delete User",
+                `Delete "${userName}" along with all their face photos and attendance data? This action cannot be undone.`
+            );
+
+            if (!confirmed) return;
+
+            deleteUserBtn.disabled = true;
+            try {
+                const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert(data.message, "success");
+                } else {
+                    showAlert(data.message, "error");
+                }
+                await loadUsers();
+            } catch (e) {
+                showAlert("Failed to delete user", "error");
+            }
+            deleteUserBtn.disabled = false;
+        });
+
+        // --- Register Face ---
+        registerBtn.addEventListener("click", async () => {
+            if (usersCache.length === 0) {
+                showAlert("Please add a user first", "error");
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = "Capturing...";
+
+            try {
+                const image = captureImage();
+                const res = await fetch("/api/register-face", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: parseInt(userSelect.value),
+                        image
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert(`Face of ${data.name} saved (photo #${data.face_count})`, "success");
+                    const selected = userSelect.options[userSelect.selectedIndex];
+                    if (selected) selected.dataset.faceCount = data.face_count;
+                    faceCountEl.textContent = data.face_count;
+                } else {
+                    showAlert(data.message, "error");
+                }
+            } catch (e) {
+                showAlert("Failed to save face", "error");
+            }
+
+            registerBtn.disabled = false;
+            registerBtn.textContent = "Capture Face";
+        });
+
+
+        recognizeBtn.addEventListener("click", async () => {
+            recognizeBtn.disabled = true;
+            recognizeBtn.textContent = "Recognizing...";
+
+            try {
+                const image = captureImage();
+                const res = await fetch("/api/recognize", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ image })
+                });
+                const data = await res.json();
+                renderResult(data);
+            } catch (e) {
+                resultPanel.className = "mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm";
+                resultPanel.innerHTML = `<span class="text-red-600 font-semibold">Failed to recognize face</span>`;
+            }
+
+            recognizeBtn.disabled = false;
+            recognizeBtn.textContent = "Recognize";
+        });
+
+        function renderResult(data) {
+            if (data.status === "recognized") {
+                resultPanel.className = "mt-4 p-3 rounded-lg bg-green-50 border border-green-200 text-sm";
+                resultPanel.innerHTML = `
+            <p class="text-xs text-green-600 font-semibold uppercase tracking-wide mb-1">Recognized</p>
+            <p class="text-xl font-bold text-green-800">${data.name}</p>
+            <p class="text-xs text-green-600 mt-1">Confidence distance: ${data.confidence} (ID: ${data.user_id})</p>
+        `;
+                showAlert("Attendance recorded: " + data.name, "success");
+            } else if (data.status === "no_face") {
+                resultPanel.className = "mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm";
+                resultPanel.innerHTML = `
+            <p class="text-xs text-red-600 font-semibold uppercase tracking-wide mb-1">Failed</p>
+            <p class="text-base font-semibold text-red-700">No face detected</p>
+        `;
+            } else {
+                resultPanel.className = "mt-4 p-3 rounded-lg bg-yellow-50 border border-yellow-200 text-sm";
+                resultPanel.innerHTML = `
+            <p class="text-xs text-yellow-600 font-semibold uppercase tracking-wide mb-1">Unknown</p>
+            <p class="text-base font-semibold text-yellow-700">Unknown</p>
+            <p class="text-xs text-yellow-600 mt-1">Confidence distance: ${data.confidence ?? '-'}</p>
+        `;
+            }
+        }
+
+
+        trainBtn.addEventListener("click", async () => {
+            trainBtn.disabled = true;
+            trainBtn.textContent = "Training...";
+            trainInfo.textContent = "Training model, please wait...";
+
+            try {
+                const res = await fetch("/api/train", { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert(data.message, "success");
+                    trainInfo.textContent = data.message;
+                } else {
+                    showAlert(data.message, "error");
+                    trainInfo.textContent = data.message;
+                }
+            } catch (e) {
+                showAlert("Failed to train model", "error");
+                trainInfo.textContent = "Failed to train model.";
+            }
+
+            trainBtn.disabled = false;
+            trainBtn.textContent = "Train Model";
+        });
+
+        loadUsers();
+    </script>
 
 </body>
+
 </html>
