@@ -6,10 +6,10 @@ from config import Config
 from face_engine.detector import detect_faces
 
 recognizer = cv2.face.LBPHFaceRecognizer_create(
-    radius=2,
-    neighbors=16,
-    grid_x=10,
-    grid_y=10
+    radius=1,
+    neighbors=8,
+    grid_x=8,
+    grid_y=8
 )
 
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -62,8 +62,7 @@ def align_face(gray_face):
 
 
 def preprocess_face(gray_face):
-    aligned = align_face(gray_face)
-    resized = cv2.resize(aligned, Config.FACE_SIZE)
+    resized = cv2.resize(gray_face, Config.FACE_SIZE)
     equalized = clahe.apply(resized)
     return equalized
 
@@ -91,6 +90,12 @@ def prepare_training_face(image_path):
     if image is None:
         return None
 
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    h, w = image.shape[:2]
+
+    if max(w, h) <= 400:
+        return preprocess_face(gray)
+    
     faces, gray = detect_faces(image)
 
     if len(faces) > 0:
