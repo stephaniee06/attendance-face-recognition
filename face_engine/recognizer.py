@@ -175,7 +175,7 @@ def train_model(valid_user_ids=None):
 
     if len(faces) == 0:
         print("[Error] No training faces found!")
-        return False, "Dataset masih kosong"
+        return False, "Dataset is empty or no valid faces detected"
 
     print("\nTraining model...")
     recognizer.train(faces, np.array(labels))
@@ -189,6 +189,23 @@ def train_model(valid_user_ids=None):
         f"Model trained with {len(faces)} photos"
         f" ({skipped} photos skipped)"
     )
+
+
+def update_model(gray_face, user_id):
+    if not os.path.exists(Config.MODEL_PATH):
+        print("[Update] No existing model found, cannot update. Run full training first.")
+        return False, "Model not trained. Please train the model first."
+
+    face = preprocess_face(gray_face)
+
+    faces = [face] + augment_face(face)
+    labels = np.array([user_id] * len(faces))
+
+    recognizer.update(faces, labels)
+    recognizer.save(Config.MODEL_PATH)
+
+    print(f"[Update] Model updated with {len(faces)} faces (1 original + {len(faces)-1} augmented) for user ID {user_id}")
+    return True, f"Model updated with {len(faces)} faces for user ID {user_id}"
 
 
 if os.path.exists(Config.MODEL_PATH):

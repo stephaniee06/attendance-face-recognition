@@ -302,6 +302,10 @@
                 const data = await res.json();
                 if (data.success) {
                     showAlert(data.message, "success");
+                    if (data.retrain_needed) {
+                        trainInfo.textContent = "User deleted. Click Train Model to update the model.";
+                        trainInfo.classList.add("text-red-500", "font-semibold");
+                    }
                 } else {
                     showAlert(data.message, "error");
                 }
@@ -335,7 +339,13 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    showAlert(`Face of ${data.name} saved (photo #${data.face_count})`, "success");
+                    let msg = `Face of ${data.name} saved (photo #${data.face_count})`;
+                    if (data.model_updated) {
+                        msg += " - Model updated";
+                    } else {
+                        msg += " - Model not yet trained. Press Train Model.";
+                    }
+                    showAlert(msg, "success");
                     const selected = userSelect.options[userSelect.selectedIndex];
                     if (selected) selected.dataset.faceCount = data.face_count;
                     faceCountEl.textContent = data.face_count;
