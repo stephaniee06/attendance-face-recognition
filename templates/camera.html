@@ -143,6 +143,9 @@
     </div>
 
     <script>
+        // URL Alamat Backend Render Kamu
+        const BASE_URL = "https://attendance-face-recognition-3yy6.onrender.com";
+
         const video = document.getElementById("video");
         const nameInput = document.getElementById("nameInput");
         const departmentInput = document.getElementById("departmentInput");
@@ -209,7 +212,8 @@
 
         async function loadUsers() {
             try {
-                const res = await fetch("/api/users");
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/users`);
                 usersCache = await res.json();
             } catch {
                 usersCache = [];
@@ -261,7 +265,8 @@
 
             addUserBtn.disabled = true;
             try {
-                const res = await fetch("/api/users", {
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/users`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, department })
@@ -298,7 +303,8 @@
 
             deleteUserBtn.disabled = true;
             try {
-                const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/users/${userId}`, { method: "DELETE" });
                 const data = await res.json();
                 if (data.success) {
                     showAlert(data.message, "success");
@@ -328,7 +334,8 @@
 
             try {
                 const image = captureImage();
-                const res = await fetch("/api/register-face", {
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/register-face`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -367,7 +374,8 @@
 
             try {
                 const image = captureImage();
-                const res = await fetch("/api/recognize", {
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/recognize`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ image })
@@ -415,7 +423,8 @@
             trainInfo.textContent = "Training model, please wait...";
 
             try {
-                const res = await fetch("/api/train", { method: "POST" });
+                // Diperbarui ke Render BASE_URL
+                const res = await fetch(`${BASE_URL}/api/train`, { method: "POST" });
                 const data = await res.json();
                 if (data.success) {
                     showAlert(data.message, "success");
