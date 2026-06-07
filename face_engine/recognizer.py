@@ -6,10 +6,10 @@ from config import Config
 from face_engine.detector import detect_faces
 
 recognizer = cv2.face.LBPHFaceRecognizer_create(
-    radius=2,
-    neighbors=16,
-    grid_x=10,
-    grid_y=10
+    radius=1,
+    neighbors=8,
+    grid_x=8,
+    grid_y=8
 )
 
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -62,8 +62,7 @@ def align_face(gray_face):
 
 
 def preprocess_face(gray_face):
-    aligned = align_face(gray_face)
-    resized = cv2.resize(aligned, Config.FACE_SIZE)
+    resized = cv2.resize(gray_face, Config.FACE_SIZE)
     equalized = clahe.apply(resized)
     return equalized
 
@@ -91,6 +90,12 @@ def prepare_training_face(image_path):
     if image is None:
         return None
 
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    h, w = image.shape[:2]
+
+    if max(w, h) <= 400:
+        return preprocess_face(gray)
+    
     faces, gray = detect_faces(image)
 
     if len(faces) > 0:
@@ -175,7 +180,7 @@ def train_model(valid_user_ids=None):
 
     if len(faces) == 0:
         print("[Error] No training faces found!")
-        return False, "Dataset masih kosong"
+        return False, "Dataset is empty or no valid faces detected"
 
     print("\nTraining model...")
     recognizer.train(faces, np.array(labels))
@@ -189,6 +194,23 @@ def train_model(valid_user_ids=None):
         f"Model trained with {len(faces)} photos"
         f" ({skipped} photos skipped)"
     )
+
+
+def update_model(gray_face, user_id):
+    if not os.path.exists(Config.MODEL_PATH):
+        print("[Update] No existing model found, cannot update. Run full training first.")
+        return False, "Model not trained. Please train the model first."
+
+    face = preprocess_face(gray_face)
+
+    faces = [face] + augment_face(face)
+    labels = np.array([user_id] * len(faces))
+
+    recognizer.update(faces, labels)
+    recognizer.save(Config.MODEL_PATH)
+
+    print(f"[Update] Model updated with {len(faces)} faces (1 original + {len(faces)-1} augmented) for user ID {user_id}")
+    return True, f"Model updated with {len(faces)} faces for user ID {user_id}"
 
 
 if os.path.exists(Config.MODEL_PATH):

@@ -7,7 +7,7 @@ from flask import Blueprint, request, jsonify
 from config import Config
 from models.database import db, User, Attendance
 from face_engine.detector import decode_base64_frame, detect_faces
-from face_engine.recognizer import train_model, predict_face
+from face_engine.recognizer import train_model, update_model, predict_face
 
 
 api = Blueprint("api", __name__)
@@ -105,9 +105,10 @@ def delete_user(user_id):
 
     return jsonify({
         "success": True,
-        "message": f"User '{user_name}' deleted successfully",
+        "message": f"User '{user_name}' deleted successfully. Please retrain the model.",
         "deleted_attendance": deleted_attendance,
-        "folder_deleted": folder_deleted
+        "folder_deleted": folder_deleted,
+        "retrain_needed": True
     })
 
 
@@ -185,12 +186,18 @@ def register_face():
         if f.lower().endswith(('.jpg', '.jpeg', '.png'))
     ])
 
+    face_gray = gray[y:y+h, x:x+w]
+    model_updated, update_msg = update_model(face_gray, user.id)
+    print(f"[API register-face] {update_msg}")
+
     return jsonify({
         "success": True,
         "user_id": user.id,
         "name": user.name,
         "face_count": face_count,
-        "file": filename
+        "file": filename,
+        "model_updated": model_updated,
+        "update_message": update_msg
     })
 
 
