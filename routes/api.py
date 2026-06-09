@@ -1,8 +1,11 @@
 import os
 import shutil
+import json
+import uuid
 import cv2
 
 from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import Config
 from models.database import db, User, Attendance
@@ -22,6 +25,38 @@ def get_user_dataset_folder(user):
         Config.DATASET_DIR,
         folder_name
     )
+
+AUTH_STORE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'instance', 'auth_users.json')
+
+
+def _ensure_auth_store():
+    os.makedirs(os.path.dirname(AUTH_STORE_PATH), exist_ok=True)
+    if not os.path.exists(AUTH_STORE_PATH):
+        with open(AUTH_STORE_PATH, 'w', encoding='utf-8') as fp:
+            json.dump([], fp)
+
+
+def _load_auth_users():
+    _ensure_auth_store()
+    with open(AUTH_STORE_PATH, 'r', encoding='utf-8') as fp:
+        return json.load(fp)
+
+
+def _save_auth_users(users):
+    _ensure_auth_store()
+    with open(AUTH_STORE_PATH, 'w', encoding='utf-8') as fp:
+        json.dump(users, fp, indent=2, ensure_ascii=False)
+
+
+def _find_auth_user(email):
+    users = _load_auth_users()
+    email = (email or '').strip().lower()
+    return next((u for u in users if u['email'] == email), None)
+
+
+def _find_auth_by_token(token):
+    users = _load_auth_users()
+    return next((u for u in users if u.get('token') == token), None)
 
 
 @api.route("/users", methods=["POST"])
@@ -109,6 +144,85 @@ def delete_user(user_id):
         "deleted_attendance": deleted_attendance,
         "folder_deleted": folder_deleted,
         "retrain_needed": True
+    })
+
+
+@api.route("/auth/register", methods=["POST"])
+def auth_register():
+    data = request.json or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not name or not email or not password:
+        return jsonify({"success": False, "message": "Nama, email, dan password wajib diisi."}), 400
+
+    if _find_auth_user(email):
+        return jsonify({"success": False, "message": "Email sudah terdaftar."}), 409
+
+    users = _load_auth_users()
+    user_id = max((u["id"] for u in users), default=0) + 1
+    token = str(uuid.uuid4())
+    user = {
+        "id": user_id,
+        "name": name,
+        "email": email,
+        "password_hash": generate_password_hash(password),
+        "token": token
+    }
+    users.append(user)
+    _save_auth_users(users)
+
+    return jsonify({
+        "success": True,
+        "token": token,
+        "user": {"id": user_id, "name": name, "email": email}
+    })
+
+
+@api.route("/auth/login", methods=["POST"])
+def auth_login():
+    data = request.json or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email or not password:
+        return jsonify({"success": False, "message": "Email dan password wajib diisi."}), 400
+
+    user = _find_auth_user(email)
+    if not user or not check_password_hash(user["password_hash"], password):
+        return jsonify({"success": False, "message": "Email atau password salah."}), 401
+
+    token = str(uuid.uuid4())
+    user["token"] = token
+    users = _load_auth_users()
+    for idx, existing in enumerate(users):
+        if existing["email"] == email:
+            users[idx] = user
+            break
+    _save_auth_users(users)
+
+    return jsonify({
+        "success": True,
+        "token": token,
+        "user": {"id": user["id"], "name": user["name"], "email": user["email"]}
+    })
+
+
+@api.route("/auth/validate", methods=["POST"])
+def auth_validate():
+    data = request.json or {}
+    token = data.get("token") or ""
+    if not token:
+        return jsonify({"success": False, "message": "Token tidak diberikan."}), 400
+
+    user = _find_auth_by_token(token)
+    if not user:
+        return jsonify({"success": False, "message": "Token tidak valid."}), 401
+
+    return jsonify({
+        "success": True,
+        "user": {"id": user["id"], "name": user["name"], "email": user["email"]}
     })
 
 
