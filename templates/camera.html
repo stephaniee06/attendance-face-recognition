@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -913,8 +913,8 @@
       crossorigin
     ></script>
     <script src="https://unpkg.com/htm@3.1.1/dist/htm.js" crossorigin></script>
+    {% raw %}
     <script>
-      {% raw %}
       const { useEffect, useRef, useState } = React;
       const html = htm.bind(React.createElement);
       const BASE_URL = window.location.origin;
@@ -1586,7 +1586,7 @@
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(html`<${App} />`);
-      {% endraw %}
     </script>
+    {% endraw %}
   </body>
 </html>
