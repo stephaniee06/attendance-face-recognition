@@ -1,1321 +1,1604 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Face Attendance</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            color-scheme: dark;
-            --bg: #090712;
-            --panel: rgba(22, 18, 35, 0.92);
-            --panel-soft: rgba(255, 255, 255, 0.08);
-            --text: #f5e9d3;
-            --muted: #b7a986;
-            --gold: #d4af37;
-            --gold-soft: rgba(212, 175, 55, 0.16);
-            --border: rgba(255, 255, 255, 0.14);
-            --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      :root {
+        color-scheme: dark;
+        --bg: #090712;
+        --panel: rgba(22, 18, 35, 0.92);
+        --panel-soft: rgba(255, 255, 255, 0.08);
+        --text: #f5e9d3;
+        --muted: #b7a986;
+        --gold: #d4af37;
+        --gold-soft: rgba(212, 175, 55, 0.16);
+        --border: rgba(255, 255, 255, 0.14);
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "Inter", sans-serif;
+        background:
+          radial-gradient(
+            circle at top right,
+            rgba(212, 175, 55, 0.18),
+            transparent 24%
+          ),
+          linear-gradient(180deg, #120c1e 0%, #08050d 100%);
+        color: var(--text);
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+
+      .page-shell {
+        width: min(1200px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
+      }
+
+      .hero {
+        position: relative;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        margin-bottom: 30px;
+        overflow: hidden;
+      }
+
+      .hero__meta {
+        position: relative;
+        z-index: 1;
+        padding: 2.5rem;
+        border: 1px solid var(--border);
+        border-radius: 32px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.04),
+          rgba(255, 255, 255, 0.02)
+        );
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .hero__meta::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top left,
+          rgba(212, 175, 55, 0.24),
+          transparent 28%
+        );
+        pointer-events: none;
+      }
+
+      .hero-backdrop {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .glass-card {
+        position: absolute;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22);
+      }
+
+      .glass-card.card-1 {
+        top: 10%;
+        left: 8%;
+        width: 180px;
+        height: 120px;
+      }
+
+      .glass-card.card-2 {
+        top: 6%;
+        right: 10%;
+        width: 150px;
+        height: 110px;
+      }
+
+      .glass-card.card-3 {
+        bottom: 18%;
+        left: 14%;
+        width: 170px;
+        height: 110px;
+      }
+
+      .glass-card.card-4 {
+        bottom: 12%;
+        right: 8%;
+        width: 210px;
+        height: 130px;
+      }
+
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 223, 115, 0.95),
+          rgba(212, 175, 55, 0.15)
+        );
+        filter: blur(1px);
+        opacity: 0.9;
+        animation: floatParticle 7s ease-in-out infinite alternate;
+      }
+
+      .particle.particle-1 {
+        top: 10%;
+        left: 20%;
+        width: 14px;
+        height: 14px;
+        animation-delay: 0s;
+      }
+
+      .particle.particle-2 {
+        top: 22%;
+        right: 22%;
+        width: 10px;
+        height: 10px;
+        animation-delay: 1.2s;
+      }
+
+      .particle.particle-3 {
+        top: 52%;
+        left: 8%;
+        width: 12px;
+        height: 12px;
+        animation-delay: 2.4s;
+      }
+
+      .particle.particle-4 {
+        bottom: 24%;
+        right: 18%;
+        width: 18px;
+        height: 18px;
+        animation-delay: 3.1s;
+      }
+
+      .particle.particle-5 {
+        bottom: 10%;
+        left: 40%;
+        width: 10px;
+        height: 10px;
+        animation-delay: 4.6s;
+      }
+
+      @keyframes floatParticle {
+        from {
+          transform: translateY(0) scale(1);
+          opacity: 0.8;
+        }
+        to {
+          transform: translateY(-18px) scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      .hero__title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2.2rem, 3vw, 3.4rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin: 0 0 1rem;
+      }
+
+      .hero__title span {
+        display: inline-block;
+        position: relative;
+        color: #fff;
+      }
+
+      .hero__title span::after {
+        content: "";
+        position: absolute;
+        top: -0.4rem;
+        left: -0.2rem;
+        width: 120%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(212, 175, 55, 0.2)
+        );
+        opacity: 0.18;
+        transform: translateX(-20px) rotate(-6deg);
+        filter: blur(5px);
+      }
+
+      .hero__desc {
+        max-width: 34rem;
+        font-size: 1.05rem;
+        line-height: 1.9;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .hero__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .tag {
+        padding: 0.85rem 1.2rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+      }
+
+      .glitter-line {
+        position: absolute;
+        left: -10%;
+        right: -10%;
+        top: 30%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(212, 175, 55, 0.9),
+          transparent
+        );
+        opacity: 0.9;
+        filter: blur(1px);
+        animation: shimmer 3.6s infinite;
+      }
+
+      @keyframes shimmer {
+        0%,
+        100% {
+          transform: translateX(-100%);
+          opacity: 0;
         }
 
-        * {
-            box-sizing: border-box;
+        10% {
+          opacity: 1;
         }
 
-        html,
-        body {
-            margin: 0;
-            min-height: 100%;
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.18), transparent 24%),
-                linear-gradient(180deg, #120c1e 0%, #08050d 100%);
-            color: var(--text);
+        50% {
+          transform: translateX(100%);
+          opacity: 0.5;
         }
 
-        body {
-            overflow-x: hidden;
+        90% {
+          opacity: 0;
         }
+      }
 
-        .page-shell {
-            width: min(1200px, calc(100% - 32px));
-            margin: 0 auto;
-            padding: 32px 0 48px;
+      .section-grid {
+        display: grid;
+        gap: 26px;
+        grid-template-columns: 1.4fr 0.95fr;
+      }
+
+      .panel {
+        padding: 1.8rem;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.05),
+          rgba(255, 255, 255, 0.02)
+        );
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at bottom right,
+          rgba(212, 175, 55, 0.08),
+          transparent 42%
+        );
+        pointer-events: none;
+      }
+
+      .panel__title {
+        margin: 0 0 1rem;
+        font-size: 1.4rem;
+        letter-spacing: -0.03em;
+        color: #fff;
+      }
+
+      .panel__text {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .video-frame {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 2px solid rgba(212, 175, 55, 0.35);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        position: relative;
+        background: #07050f;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+        background: #000;
+      }
+
+      .camera-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.2rem 1.5rem;
+        text-align: center;
+        color: var(--text);
+        background: rgba(0, 0, 0, 0.55);
+        font-size: 1rem;
+        line-height: 1.6;
+        pointer-events: none;
+      }
+
+      .status-panel {
+        margin-top: 18px;
+        border-radius: 24px;
+        padding: 1.2rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        min-height: 128px;
+        color: var(--text);
+      }
+
+      .status-panel strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #fff;
+      }
+
+      .controls {
+        display: grid;
+        gap: 1.1rem;
+      }
+
+      .input-group {
+        display: grid;
+        gap: 0.85rem;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        padding: 16px 18px;
+        font-size: 1rem;
+        outline: none;
+        transition:
+          border-color 0.25s ease,
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+
+      select {
+        color: #fff;
+        background: rgba(18, 11, 30, 0.94);
+        border-color: rgba(255, 255, 255, 0.18);
+        text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+      }
+
+      option {
+        color: #111;
+        background: #fff;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: rgba(212, 175, 55, 0.8);
+        box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.08);
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        font-size: 1rem;
+        padding: 1rem 1.75rem;
+        min-height: 56px;
+        min-width: 170px;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08),
+          transparent 32%,
+          rgba(255, 255, 255, 0.08)
+        );
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+
+      .button:hover::before {
+        opacity: 1;
+      }
+
+      .button--primary {
+        background: linear-gradient(135deg, #d4af37, #f5da8f);
+        color: #111;
+        box-shadow: 0 18px 35px rgba(212, 175, 55, 0.22);
+      }
+
+      .button--secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #f5e9d3;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+      }
+
+      .button--danger {
+        background: rgba(255, 86, 86, 0.15);
+        color: #ffb3b3;
+        border: 1px solid rgba(255, 86, 86, 0.22);
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+      }
+
+      .button:active {
+        transform: translateY(0);
+      }
+
+      .button-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .auth-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .auth-tabs button.tab {
+        flex: 0 1 auto;
+        padding: 1rem 1.75rem;
+        min-width: 150px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background-color: #f7dc82 !important;
+        background-image: linear-gradient(
+          135deg,
+          #f7dc82 0%,
+          #d4af37 45%,
+          #f7dc82 100%
+        ) !important;
+        background-size: 200% 200%;
+        background-repeat: no-repeat;
+        color: #111 !important;
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        font-size: 1rem;
+        text-align: center;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        box-shadow: 0 20px 36px rgba(212, 175, 55, 0.26);
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s ease,
+          border-color 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-clip: padding-box;
+      }
+
+      .auth-tabs button.tab:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 24px 42px rgba(212, 175, 55, 0.3);
+        background-color: #fff1b8 !important;
+        background-image: linear-gradient(
+          135deg,
+          #fff1b8 0%,
+          #d4af37 45%,
+          #fff1b8 100%
+        ) !important;
+      }
+
+      .auth-tabs button.tab--active {
+        background-color: #fce58b !important;
+        background-image: linear-gradient(
+          135deg,
+          #fce58b 0%,
+          #d4af37 45%,
+          #fce58b 100%
+        ) !important;
+        color: #111 !important;
+        border-color: rgba(255, 255, 255, 0.32);
+        box-shadow: 0 24px 46px rgba(212, 175, 55, 0.34);
+      }
+
+      .auth-note {
+        margin-top: 0.9rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .auth-screen {
+        display: grid;
+        place-items: center;
+        min-height: calc(100vh - 64px);
+        padding: 2rem 0;
+      }
+
+      .auth-card {
+        width: min(540px, 100%);
+        border-radius: 32px;
+        padding: 2.2rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(10, 8, 19, 0.96);
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.38);
+      }
+
+      .auth-card h2 {
+        margin: 0 0 1.2rem;
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        color: #fff;
+        letter-spacing: -0.03em;
+        text-align: center;
+      }
+
+      .auth-card p {
+        margin: 0.8rem 0 0;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .auth-card .button {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .auth-action-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.5rem 0 0;
+        flex-wrap: wrap;
+      }
+
+      .auth-user-badge {
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        background: rgba(212, 175, 55, 0.14);
+        border: 1px solid rgba(212, 175, 55, 0.24);
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .auth-screen .auth-tabs {
+        margin-top: 1.8rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .auth-screen input {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .auth-screen .button--ghost {
+        border-color: rgba(255, 255, 255, 0.18);
+        color: #f5e9d3;
+      }
+
+      .panel.auth-panel {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .button--ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text);
+      }
+
+      .glitter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        background: rgba(212, 175, 55, 0.14);
+        color: #fff;
+        font-size: 0.92rem;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+
+      .glitter-pill::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fff, var(--gold));
+        box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+      }
+
+      .notification {
+        position: fixed;
+        right: 24px;
+        top: 24px;
+        display: grid;
+        gap: 12px;
+        z-index: 50;
+      }
+
+      .toast {
+        border-radius: 18px;
+        padding: 14px 18px;
+        min-width: 260px;
+        background: rgba(10, 8, 17, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 24px 52px rgba(0, 0, 0, 0.38);
+        color: #f5e9d3;
+        animation: slideUp 0.35s ease;
+      }
+
+      .toast.success {
+        border-color: rgba(212, 175, 55, 0.5);
+      }
+
+      .toast.error {
+        border-color: rgba(255, 86, 86, 0.55);
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        .hero {
-            position: relative;
-            display: grid;
-            gap: 24px;
-            grid-template-columns: 1fr;
-            align-items: stretch;
-            margin-bottom: 30px;
-            overflow: hidden;
+      .grid-stack {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .info-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        padding: 1.45rem;
+        display: grid;
+        gap: 0.85rem;
+      }
+
+      .info-card h3 {
+        margin: 0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+      }
+
+      .info-card p {
+        margin: 0;
+        color: var(--text);
+        line-height: 1.75;
+      }
+
+      .result-badge {
+        border-radius: 22px;
+        padding: 0.8rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-size: 0.92rem;
+        background: rgba(212, 175, 55, 0.14);
+        color: var(--text);
+        border: 1px solid rgba(212, 175, 55, 0.28);
+      }
+
+      .result-badge span {
+        font-weight: 700;
+      }
+
+      .inputs-row {
+        display: grid;
+        gap: 0.95rem;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .meta-row {
+        display: flex;
+        gap: 0.95rem;
+        flex-wrap: wrap;
+      }
+
+      .meta-row .panel {
+        flex: 1;
+        min-width: 250px;
+      }
+
+      .select-wrapper {
+        position: relative;
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+        background: rgba(18, 10, 35, 0.96);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+          0 16px 35px rgba(0, 0, 0, 0.18);
+      }
+
+      .select-wrapper::after {
+        content: "▾";
+        position: absolute;
+        top: 50%;
+        right: 1.35rem;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.85);
+        pointer-events: none;
+      }
+
+      .select-wrapper select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 100%;
+        padding: 16px 3.8rem 16px 18px;
+        background: linear-gradient(
+          180deg,
+          rgba(28, 12, 48, 0.98),
+          rgba(16, 8, 38, 0.98)
+        );
+        border: 1px solid rgba(212, 175, 55, 0.32);
+        box-shadow:
+          inset 0 10px 26px rgba(0, 0, 0, 0.28),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+        color: #f4ecd0;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        border-radius: 24px;
+        min-height: 58px;
+        outline: none;
+      }
+
+      .select-wrapper select:hover {
+        border-color: rgba(212, 175, 55, 0.6);
+        background: linear-gradient(
+          180deg,
+          rgba(33, 14, 62, 0.98),
+          rgba(18, 9, 44, 0.98)
+        );
+      }
+
+      .select-wrapper select:focus {
+        border-color: rgba(212, 175, 55, 0.9);
+        box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.1);
+      }
+
+      .select-wrapper select:disabled {
+        opacity: 0.75;
+      }
+
+      .select-wrapper option,
+      option {
+        color: #f4ecd0;
+        background: #130b1f;
+      }
+
+      .select-wrapper option:hover,
+      option:hover {
+        background: rgba(212, 175, 55, 0.14);
+      }
+
+      .select-wrapper option:checked,
+      option:checked {
+        background: rgba(212, 175, 55, 0.24);
+        color: #fff;
+      }
+
+      .select-wrapper select:disabled {
+        opacity: 0.75;
+      }
+
+      .select-wrapper option,
+      option {
+        color: #f4ecd0;
+        background: #130b1f;
+      }
+
+      .select-wrapper option:hover,
+      option:hover {
+        background: rgba(212, 175, 55, 0.14);
+      }
+
+      .select-wrapper option:checked,
+      option:checked {
+        background: rgba(212, 175, 55, 0.24);
+        color: #fff;
+      }
+
+      @media (max-width: 960px) {
+        .hero,
+        .section-grid {
+          grid-template-columns: 1fr;
         }
 
         .hero__meta {
-            position: relative;
-            z-index: 1;
-            padding: 2.5rem;
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-            backdrop-filter: blur(18px);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .hero__meta::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.24), transparent 28%);
-            pointer-events: none;
-        }
-
-        .hero-backdrop {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .glass-card {
-            position: absolute;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22);
-        }
-
-        .glass-card.card-1 {
-            top: 10%;
-            left: 8%;
-            width: 180px;
-            height: 120px;
-        }
-
-        .glass-card.card-2 {
-            top: 6%;
-            right: 10%;
-            width: 150px;
-            height: 110px;
-        }
-
-        .glass-card.card-3 {
-            bottom: 18%;
-            left: 14%;
-            width: 170px;
-            height: 110px;
-        }
-
-        .glass-card.card-4 {
-            bottom: 12%;
-            right: 8%;
-            width: 210px;
-            height: 130px;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,223,115,0.95), rgba(212,175,55,0.15));
-            filter: blur(1px);
-            opacity: 0.9;
-            animation: floatParticle 7s ease-in-out infinite alternate;
-        }
-
-        .particle.particle-1 {
-            top: 10%;
-            left: 20%;
-            width: 14px;
-            height: 14px;
-            animation-delay: 0s;
-        }
-
-        .particle.particle-2 {
-            top: 22%;
-            right: 22%;
-            width: 10px;
-            height: 10px;
-            animation-delay: 1.2s;
-        }
-
-        .particle.particle-3 {
-            top: 52%;
-            left: 8%;
-            width: 12px;
-            height: 12px;
-            animation-delay: 2.4s;
-        }
-
-        .particle.particle-4 {
-            bottom: 24%;
-            right: 18%;
-            width: 18px;
-            height: 18px;
-            animation-delay: 3.1s;
-        }
-
-        .particle.particle-5 {
-            bottom: 10%;
-            left: 40%;
-            width: 10px;
-            height: 10px;
-            animation-delay: 4.6s;
-        }
-
-        @keyframes floatParticle {
-            from {
-                transform: translateY(0) scale(1);
-                opacity: 0.8;
-            }
-            to {
-                transform: translateY(-18px) scale(1.2);
-                opacity: 1;
-            }
-        }
-
-        .hero__title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.2rem, 3vw, 3.4rem);
-            line-height: 1;
-            letter-spacing: -0.04em;
-            margin: 0 0 1rem;
-        }
-
-        .hero__title span {
-            display: inline-block;
-            position: relative;
-            color: #fff;
-        }
-
-        .hero__title span::after {
-            content: '';
-            position: absolute;
-            top: -0.4rem;
-            left: -0.2rem;
-            width: 120%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(212, 175, 55, 0.2));
-            opacity: 0.18;
-            transform: translateX(-20px) rotate(-6deg);
-            filter: blur(5px);
-        }
-
-        .hero__desc {
-            max-width: 34rem;
-            font-size: 1.05rem;
-            line-height: 1.9;
-            color: var(--muted);
-            margin: 0;
-        }
-
-        .hero__tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .tag {
-            padding: 0.85rem 1.2rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-            letter-spacing: 0.02em;
-        }
-
-        .glitter-line {
-            position: absolute;
-            left: -10%;
-            right: -10%;
-            top: 30%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.9), transparent);
-            opacity: 0.9;
-            filter: blur(1px);
-            animation: shimmer 3.6s infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            50% {
-                transform: translateX(100%);
-                opacity: 0.5;
-            }
-
-            90% {
-                opacity: 0;
-            }
-        }
-
-        .section-grid {
-            display: grid;
-            gap: 26px;
-            grid-template-columns: 1.4fr 0.95fr;
-        }
-
-        .panel {
-            padding: 1.8rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .panel::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.08), transparent 42%);
-            pointer-events: none;
-        }
-
-        .panel__title {
-            margin: 0 0 1rem;
-            font-size: 1.4rem;
-            letter-spacing: -0.03em;
-            color: #fff;
-        }
-
-        .panel__text {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.8;
-        }
-
-        .video-frame {
-            width: 100%;
-            aspect-ratio: 4 / 3;
-            border-radius: 28px;
-            overflow: hidden;
-            border: 2px solid rgba(212, 175, 55, 0.35);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-            position: relative;
-            background: #07050f;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-            background: #000;
-        }
-
-        .camera-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.2rem 1.5rem;
-            text-align: center;
-            color: var(--text);
-            background: rgba(0, 0, 0, 0.55);
-            font-size: 1rem;
-            line-height: 1.6;
-            pointer-events: none;
-        }
-
-        .status-panel {
-            margin-top: 18px;
-            border-radius: 24px;
-            padding: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.04);
-            min-height: 128px;
-            color: var(--text);
-        }
-
-        .status-panel strong {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-
-        .controls {
-            display: grid;
-            gap: 1.1rem;
-        }
-
-        .input-group {
-            display: grid;
-            gap: 0.85rem;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            padding: 16px 18px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        select {
-            color: #fff;
-            background: rgba(18, 11, 30, 0.94);
-            border-color: rgba(255, 255, 255, 0.18);
-            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-        }
-
-        option {
-            color: #111;
-            background: #fff;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: rgba(212, 175, 55, 0.8);
-            box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.08);
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            font-size: 1rem;
-            padding: 1rem 1.75rem;
-            min-height: 56px;
-            min-width: 170px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 32%, rgba(255, 255, 255, 0.08));
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .button:hover::before {
-            opacity: 1;
-        }
-
-        .button--primary {
-            background: linear-gradient(135deg, #d4af37, #f5da8f);
-            color: #111;
-            box-shadow: 0 18px 35px rgba(212, 175, 55, 0.22);
-        }
-
-        .button--secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #f5e9d3;
-            border: 1px solid rgba(212, 175, 55, 0.28);
-        }
-
-        .button--danger {
-            background: rgba(255, 86, 86, 0.15);
-            color: #ffb3b3;
-            border: 1px solid rgba(255, 86, 86, 0.22);
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-        }
-
-        .button:active {
-            transform: translateY(0);
-        }
-
-        .button-row {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .auth-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .auth-tabs button.tab {
-            flex: 0 1 auto;
-            padding: 1rem 1.75rem;
-            min-width: 150px;
-            border-radius: 22px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background-color: #f7dc82 !important;
-            background-image: linear-gradient(135deg, #f7dc82 0%, #d4af37 45%, #f7dc82 100%) !important;
-            background-size: 200% 200%;
-            background-repeat: no-repeat;
-            color: #111 !important;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-size: 1rem;
-            text-align: center;
-            letter-spacing: 0.04em;
-            text-transform: none;
-            box-shadow: 0 20px 36px rgba(212, 175, 55, 0.26);
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-clip: padding-box;
-        }
-
-        .auth-tabs button.tab:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 24px 42px rgba(212, 175, 55, 0.3);
-            background-color: #fff1b8 !important;
-            background-image: linear-gradient(135deg, #fff1b8 0%, #d4af37 45%, #fff1b8 100%) !important;
-        }
-
-        .auth-tabs button.tab--active {
-            background-color: #fce58b !important;
-            background-image: linear-gradient(135deg, #fce58b 0%, #d4af37 45%, #fce58b 100%) !important;
-            color: #111 !important;
-            border-color: rgba(255, 255, 255, 0.32);
-            box-shadow: 0 24px 46px rgba(212, 175, 55, 0.34);
-        }
-
-        .auth-note {
-            margin-top: 0.9rem;
-            color: var(--muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .auth-screen {
-            display: grid;
-            place-items: center;
-            min-height: calc(100vh - 64px);
-            padding: 2rem 0;
-        }
-
-        .auth-card {
-            width: min(540px, 100%);
-            border-radius: 32px;
-            padding: 2.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(10, 8, 19, 0.96);
-            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.38);
-        }
-
-        .auth-card h2 {
-            margin: 0 0 1.2rem;
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            color: #fff;
-            letter-spacing: -0.03em;
-            text-align: center;
-        }
-
-        .auth-card p {
-            margin: 0.8rem 0 0;
-            color: var(--muted);
-            line-height: 1.8;
-        }
-
-        .auth-card .button {
-            width: 100%;
-            min-width: 0;
-        }
-
-        .auth-action-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin: 1.5rem 0 0;
-            flex-wrap: wrap;
-        }
-
-        .auth-user-badge {
-            padding: 0.75rem 1rem;
-            border-radius: 16px;
-            background: rgba(212, 175, 55, 0.14);
-            border: 1px solid rgba(212, 175, 55, 0.24);
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .auth-screen .auth-tabs {
-            margin-top: 1.8rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .auth-screen input {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .auth-screen .button--ghost {
-            border-color: rgba(255, 255, 255, 0.18);
-            color: #f5e9d3;
-        }
-
-        .panel.auth-panel {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .button--ghost {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: var(--text);
-        }
-
-        .glitter-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.7rem 1rem;
-            border-radius: 999px;
-            background: rgba(212, 175, 55, 0.14);
-            color: #fff;
-            font-size: 0.92rem;
-            border: 1px solid rgba(212, 175, 55, 0.28);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-        }
-
-        .glitter-pill::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #fff, var(--gold));
-            box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
-        }
-
-        .notification {
-            position: fixed;
-            right: 24px;
-            top: 24px;
-            display: grid;
-            gap: 12px;
-            z-index: 50;
-        }
-
-        .toast {
-            border-radius: 18px;
-            padding: 14px 18px;
-            min-width: 260px;
-            background: rgba(10, 8, 17, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 24px 52px rgba(0, 0, 0, 0.38);
-            color: #f5e9d3;
-            animation: slideUp 0.35s ease;
-        }
-
-        .toast.success {
-            border-color: rgba(212, 175, 55, 0.5);
-        }
-
-        .toast.error {
-            border-color: rgba(255, 86, 86, 0.55);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .grid-stack {
-            display: grid;
-            gap: 24px;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 28px;
-            padding: 1.45rem;
-            display: grid;
-            gap: 0.85rem;
-        }
-
-        .info-card h3 {
-            margin: 0;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: var(--muted);
-        }
-
-        .info-card p {
-            margin: 0;
-            color: var(--text);
-            line-height: 1.75;
-        }
-
-        .result-badge {
-            border-radius: 22px;
-            padding: 0.8rem 1rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.55rem;
-            font-size: 0.92rem;
-            background: rgba(212, 175, 55, 0.14);
-            color: var(--text);
-            border: 1px solid rgba(212, 175, 55, 0.28);
-        }
-
-        .result-badge span {
-            font-weight: 700;
+          padding: 2rem;
         }
 
         .inputs-row {
-            display: grid;
-            gap: 0.95rem;
-            grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
         }
 
         .meta-row {
-            display: flex;
-            gap: 0.95rem;
-            flex-wrap: wrap;
+          display: block;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .page-shell {
+          width: min(100%, calc(100% - 24px));
+          padding: 24px 0 32px;
         }
 
-        .meta-row .panel {
-            flex: 1;
-            min-width: 250px;
+        .hero__title {
+          font-size: clamp(2rem, 5vw, 2.7rem);
         }
 
-        .select-wrapper {
-            position: relative;
-            width: 100%;
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.28);
-            background: rgba(18, 10, 35, 0.96);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 16px 35px rgba(0, 0, 0, 0.18);
+        .button {
+          width: 100%;
         }
-
-        .select-wrapper::after {
-            content: '▾';
-            position: absolute;
-            top: 50%;
-            right: 1.35rem;
-            transform: translateY(-50%);
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.85);
-            pointer-events: none;
-        }
-
-        .select-wrapper select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 100%;
-            padding: 16px 3.8rem 16px 18px;
-            background: linear-gradient(180deg, rgba(28, 12, 48, 0.98), rgba(16, 8, 38, 0.98));
-            border: 1px solid rgba(212, 175, 55, 0.32);
-            box-shadow: inset 0 10px 26px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-            color: #f4ecd0;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            border-radius: 24px;
-            min-height: 58px;
-            outline: none;
-        }
-
-        .select-wrapper select:hover {
-            border-color: rgba(212, 175, 55, 0.6);
-            background: linear-gradient(180deg, rgba(33, 14, 62, 0.98), rgba(18, 9, 44, 0.98));
-        }
-
-        .select-wrapper select:focus {
-            border-color: rgba(212, 175, 55, 0.9);
-            box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.10);
-        }
-
-        .select-wrapper select:disabled {
-            opacity: 0.75;
-        }
-
-        .select-wrapper option,
-        option {
-            color: #f4ecd0;
-            background: #130b1f;
-        }
-
-        .select-wrapper option:hover,
-        option:hover {
-            background: rgba(212, 175, 55, 0.14);
-        }
-
-        .select-wrapper option:checked,
-        option:checked {
-            background: rgba(212, 175, 55, 0.24);
-            color: #fff;
-        }
-
-        .select-wrapper select:disabled {
-            opacity: 0.75;
-        }
-
-        .select-wrapper option,
-        option {
-            color: #f4ecd0;
-            background: #130b1f;
-        }
-
-        .select-wrapper option:hover,
-        option:hover {
-            background: rgba(212, 175, 55, 0.14);
-        }
-
-        .select-wrapper option:checked,
-        option:checked {
-            background: rgba(212, 175, 55, 0.24);
-            color: #fff;
-        }
-
-        @media (max-width: 960px) {
-            .hero,
-            .section-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero__meta {
-                padding: 2rem;
-            }
-
-            .inputs-row {
-                grid-template-columns: 1fr;
-            }
-
-            .meta-row {
-                display: block;
-            }
-        }
-
-        @media (max-width: 680px) {
-            .page-shell {
-                width: min(100%, calc(100% - 24px));
-                padding: 24px 0 32px;
-            }
-
-            .hero__title {
-                font-size: clamp(2rem, 5vw, 2.7rem);
-            }
-
-            .button {
-                width: 100%;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="root" class="page-shell"></div>
     <div class="notification" id="notification-root"></div>
 
-    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      crossorigin
+    ></script>
     <script src="https://unpkg.com/htm@3.1.1/dist/htm.js" crossorigin></script>
     <script>
-        const { useEffect, useRef, useState } = React;
-        const html = htm.bind(React.createElement);
-        const BASE_URL = window.location.origin;
+      const { useEffect, useRef, useState } = React;
+      const html = htm.bind(React.createElement);
+      const BASE_URL = window.location.origin;
 
-        function useCamera(videoRef, setReady, setError, enabled) {
-            useEffect(() => {
-                if (!enabled) {
-                    setReady(false);
-                    return;
-                }
+      function useCamera(videoRef, setReady, setError, enabled) {
+        useEffect(() => {
+          if (!enabled) {
+            setReady(false);
+            return;
+          }
 
-                let mounted = true;
-                async function startCamera() {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                        if (mounted && videoRef.current) {
-                            videoRef.current.srcObject = stream;
-                            setReady(true);
-                        }
-                    } catch (error) {
-                        console.warn(error);
-                        setError(error?.message || 'Gagal mengakses kamera.');
-                    }
-                }
-                startCamera();
-                return () => {
-                    mounted = false;
-                    setReady(false);
-                    if (videoRef.current?.srcObject) {
-                        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-                    }
-                };
-            }, [videoRef, setReady, setError, enabled]);
-        }
-
-        function notify(message, variant = 'success') {
-            const root = document.getElementById('notification-root');
-            const toast = document.createElement('div');
-            toast.className = `toast ${variant}`;
-            toast.textContent = message;
-            root.appendChild(toast);
-            setTimeout(() => toast.remove(), 4200);
-        }
-
-        function App() {
-            const videoRef = useRef(null);
-            const [users, setUsers] = useState([]);
-            const [selectedUserId, setSelectedUserId] = useState('');
-            const [name, setName] = useState('');
-            const [department, setDepartment] = useState('');
-            const [faceCount, setFaceCount] = useState(0);
-            const [trainStatus, setTrainStatus] = useState('Retrain the model after adding or deleting faces.');
-            const [result, setResult] = useState({ status: 'ready', message: 'Klik Recognize untuk mendeteksi wajah.' });
-            const [loading, setLoading] = useState({ action: '', state: false });
-            const [cameraReady, setCameraReady] = useState(false);
-            const [cameraError, setCameraError] = useState('');
-            const [authMode, setAuthMode] = useState('login');
-            const [authEmail, setAuthEmail] = useState('');
-            const [authPassword, setAuthPassword] = useState('');
-            const [authName, setAuthName] = useState('');
-            const [authStatus, setAuthStatus] = useState('Silakan masuk atau daftar untuk mengelola absensi.');
-            const [authToken, setAuthToken] = useState(localStorage.getItem('face-auth-token') || '');
-            const [authUser, setAuthUser] = useState(() => {
-                const stored = localStorage.getItem('face-auth-user');
-                return stored ? JSON.parse(stored) : null;
-            });
-            const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-            useCamera(videoRef, setCameraReady, setCameraError, isAuthenticated);
-
-            useEffect(() => {
-                async function restoreAuth() {
-                    if (!authToken) {
-                        return;
-                    }
-                    try {
-                        const res = await fetch(`${BASE_URL}/api/auth/validate`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ token: authToken })
-                        });
-                        const data = await res.json();
-                        if (res.ok && data.success) {
-                            setAuthUser(data.user);
-                            setIsAuthenticated(true);
-                            setAuthStatus(`Selamat datang kembali, ${data.user.name}.`);
-                        } else {
-                            clearAuth();
-                        }
-                    } catch (error) {
-                        clearAuth();
-                    }
-                }
-                restoreAuth();
-            }, []);
-
-            useEffect(() => {
-                if (isAuthenticated) {
-                    loadUsers();
-                }
-            }, [isAuthenticated]);
-
-
-            async function loadUsers() {
-                try {
-                    const res = await fetch(`${BASE_URL}/api/users`);
-                    const data = await res.json();
-                    setUsers(data);
-                    if (data.length > 0) {
-                        setSelectedUserId(String(data[0].id));
-                        setFaceCount(data[0].face_count || 0);
-                    } else {
-                        setSelectedUserId('');
-                        setFaceCount(0);
-                    }
-                } catch (error) {
-                    setUsers([]);
-                    setSelectedUserId('');
-                    setFaceCount(0);
-                }
+          let mounted = true;
+          async function startCamera() {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+              });
+              if (mounted && videoRef.current) {
+                videoRef.current.srcObject = stream;
+                setReady(true);
+              }
+            } catch (error) {
+              console.warn(error);
+              setError(error?.message || "Gagal mengakses kamera.");
             }
-
-            function getSelectedUser() {
-                return users.find((user) => String(user.id) === String(selectedUserId));
+          }
+          startCamera();
+          return () => {
+            mounted = false;
+            setReady(false);
+            if (videoRef.current?.srcObject) {
+              videoRef.current.srcObject
+                .getTracks()
+                .forEach((track) => track.stop());
             }
+          };
+        }, [videoRef, setReady, setError, enabled]);
+      }
 
-            function saveAuth(user, token) {
-                setAuthUser(user);
-                setAuthToken(token);
+      function notify(message, variant = "success") {
+        const root = document.getElementById("notification-root");
+        const toast = document.createElement("div");
+        toast.className = `toast ${variant}`;
+        toast.textContent = message;
+        root.appendChild(toast);
+        setTimeout(() => toast.remove(), 4200);
+      }
+
+      function App() {
+        const videoRef = useRef(null);
+        const [users, setUsers] = useState([]);
+        const [selectedUserId, setSelectedUserId] = useState("");
+        const [name, setName] = useState("");
+        const [department, setDepartment] = useState("");
+        const [faceCount, setFaceCount] = useState(0);
+        const [trainStatus, setTrainStatus] = useState(
+          "Retrain the model after adding or deleting faces.",
+        );
+        const [result, setResult] = useState({
+          status: "ready",
+          message: "Klik Recognize untuk mendeteksi wajah.",
+        });
+        const [loading, setLoading] = useState({ action: "", state: false });
+        const [cameraReady, setCameraReady] = useState(false);
+        const [cameraError, setCameraError] = useState("");
+        const [authMode, setAuthMode] = useState("login");
+        const [authEmail, setAuthEmail] = useState("");
+        const [authPassword, setAuthPassword] = useState("");
+        const [authName, setAuthName] = useState("");
+        const [authStatus, setAuthStatus] = useState(
+          "Silakan masuk atau daftar untuk mengelola absensi.",
+        );
+        const [authToken, setAuthToken] = useState(
+          localStorage.getItem("face-auth-token") || "",
+        );
+        const [authUser, setAuthUser] = useState(() => {
+          const stored = localStorage.getItem("face-auth-user");
+          return stored ? JSON.parse(stored) : null;
+        });
+        const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+        useCamera(videoRef, setCameraReady, setCameraError, isAuthenticated);
+
+        useEffect(() => {
+          async function restoreAuth() {
+            if (!authToken) {
+              return;
+            }
+            try {
+              const res = await fetch(
+                `https://attendance-face-recognition-3yy6.onrender.com/api/auth/validate`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ token: authToken }),
+                },
+              );
+              const data = await res.json();
+              if (res.ok && data.success) {
+                setAuthUser(data.user);
                 setIsAuthenticated(true);
-                localStorage.setItem('face-auth-token', token);
-                localStorage.setItem('face-auth-user', JSON.stringify(user));
-            }
-
-            function clearAuth() {
-                setAuthUser(null);
-                setAuthToken('');
-                setIsAuthenticated(false);
-                localStorage.removeItem('face-auth-token');
-                localStorage.removeItem('face-auth-user');
-            }
-
-            async function handleAuthSubmit() {
-                if (!authEmail.trim() || !authPassword.trim() || (authMode === 'register' && !authName.trim())) {
-                    setAuthStatus('Email, password, dan nama (untuk registrasi) wajib diisi.');
-                    notify('Isi semua field yang dibutuhkan.', 'error');
-                    return;
-                }
-                setLoading({ action: 'auth', state: true });
-                try {
-                    const res = await fetch(`${BASE_URL}/api/auth/${authMode}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            name: authName.trim(),
-                            email: authEmail.trim(),
-                            password: authPassword
-                        })
-                    });
-                    const data = await res.json();
-                    if (!res.ok || !data.success) {
-                        setAuthStatus(data.message || 'Gagal melakukan autentikasi.');
-                        notify(data.message || 'Autentikasi gagal.', 'error');
-                        return;
-                    }
-                    saveAuth(data.user, data.token);
-                    setAuthStatus(authMode === 'login'
-                        ? `Selamat datang kembali, ${data.user.name}.`
-                        : `Registrasi berhasil. Selamat datang, ${data.user.name}.`);
-                    notify(authMode === 'login' ? 'Login berhasil.' : 'Registrasi berhasil.', 'success');
-                } catch (error) {
-                    setAuthStatus('Tidak dapat terhubung ke server autentikasi.');
-                    notify('Gagal terhubung ke server.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            function logout() {
+                setAuthStatus(`Selamat datang kembali, ${data.user.name}.`);
+              } else {
                 clearAuth();
-                setAuthStatus('Silakan masuk atau daftar untuk melanjutkan.');
+              }
+            } catch (error) {
+              clearAuth();
             }
+          }
+          restoreAuth();
+        }, []);
 
-            function captureFrame() {
-                const video = videoRef.current;
-                if (!video) return null;
-                const width = video.videoWidth || 640;
-                const height = video.videoHeight || 480;
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.translate(width, 0);
-                ctx.scale(-1, 1);
-                ctx.drawImage(video, 0, 0, width, height);
-                return canvas.toDataURL('image/jpeg');
+        useEffect(() => {
+          if (isAuthenticated) {
+            loadUsers();
+          }
+        }, [isAuthenticated]);
+
+        async function loadUsers() {
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/users`,
+            );
+            const data = await res.json();
+            setUsers(data);
+            if (data.length > 0) {
+              setSelectedUserId(String(data[0].id));
+              setFaceCount(data[0].face_count || 0);
+            } else {
+              setSelectedUserId("");
+              setFaceCount(0);
             }
-
-            async function createUser() {
-                if (!name.trim()) {
-                    notify('Nama wajib diisi.', 'error');
-                    return;
-                }
-                setLoading({ action: 'create', state: true });
-                try {
-                    const res = await fetch(`${BASE_URL}/api/users`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: name.trim(), department: department.trim() })
-                    });
-                    const data = await res.json();
-                    notify(`Pengguna ${data.name} berhasil dibuat.`, 'success');
-                    setName('');
-                    setDepartment('');
-                    await loadUsers();
-                    setSelectedUserId(String(data.user_id));
-                    setFaceCount(0);
-                } catch (error) {
-                    notify('Gagal membuat pengguna.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            async function deleteUser() {
-                const user = getSelectedUser();
-                if (!user) {
-                    notify('Tidak ada pengguna untuk dihapus.', 'error');
-                    return;
-                }
-                const confirmed = window.confirm(`Hapus pengguna ${user.name} dan semua datanya?`);
-                if (!confirmed) return;
-                setLoading({ action: 'delete', state: true });
-                try {
-                    const res = await fetch(`${BASE_URL}/api/users/${user.id}`, { method: 'DELETE' });
-                    const data = await res.json();
-                    if (data.success) {
-                        notify(data.message, 'success');
-                        if (data.retrain_needed) {
-                            setTrainStatus('Pengguna dihapus. Tekan Train Model untuk memperbarui model.');
-                        }
-                        await loadUsers();
-                    } else {
-                        notify(data.message || 'Gagal menghapus pengguna.', 'error');
-                    }
-                } catch (error) {
-                    notify('Gagal menghapus pengguna.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            async function registerFace() {
-                const user = getSelectedUser();
-                if (!user) {
-                    notify('Tambahkan pengguna terlebih dahulu.', 'error');
-                    return;
-                }
-                const image = captureFrame();
-                if (!image) {
-                    notify('Kamera belum siap.', 'error');
-                    return;
-                }
-                setLoading({ action: 'register', state: true });
-                try {
-                    const res = await fetch(`${BASE_URL}/api/register-face`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user_id: user.id, image })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        notify(`Foto wajah ${data.name} tersimpan (#${data.face_count}).`, 'success');
-                        setFaceCount(data.face_count);
-                        setUsers((prev) => prev.map((item) => item.id === user.id ? { ...item, face_count: data.face_count } : item));
-                    } else {
-                        notify(data.message || 'Gagal menyimpan wajah.', 'error');
-                    }
-                } catch (error) {
-                    notify('Gagal menyimpan foto wajah.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            async function recognizeFace() {
-                const image = captureFrame();
-                if (!image) {
-                    notify('Kamera belum siap.', 'error');
-                    return;
-                }
-                setLoading({ action: 'recognize', state: true });
-                try {
-                    const res = await fetch(`${BASE_URL}/api/recognize`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image })
-                    });
-                    const data = await res.json();
-                    if (data.status === 'recognized') {
-                        setResult({ status: 'recognized', message: `${data.name} dikenali dengan confidence ${data.confidence}.` });
-                        notify(`Absensi tercatat untuk ${data.name}.`, 'success');
-                    } else if (data.status === 'no_face') {
-                        setResult({ status: 'no_face', message: 'Wajah tidak terdeteksi. Coba lagi.' });
-                        notify('Wajah tidak ditemukan.', 'error');
-                    } else {
-                        setResult({ status: 'unknown', message: 'Wajah tidak dikenali.' });
-                        notify('Wajah tidak dikenali.', 'error');
-                    }
-                } catch (error) {
-                    setResult({ status: 'error', message: 'Permintaan pengenalan gagal.' });
-                    notify('Gagal melakukan pengenalan.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            async function trainModel() {
-                setLoading({ action: 'train', state: true });
-                setTrainStatus('Melatih model, tunggu sebentar...');
-                try {
-                    const res = await fetch(`${BASE_URL}/api/train`, { method: 'POST' });
-                    const data = await res.json();
-                    if (data.success) {
-                        setTrainStatus(data.message);
-                        notify(data.message, 'success');
-                    } else {
-                        setTrainStatus(data.message || 'Pelatihan gagal.');
-                        notify(data.message || 'Pelatihan model gagal.', 'error');
-                    }
-                } catch (error) {
-                    setTrainStatus('Gagal melakukan pelatihan model.');
-                    notify('Gagal melatih model.', 'error');
-                } finally {
-                    setLoading({ action: '', state: false });
-                }
-            }
-
-            function handleUserChange(event) {
-                const value = event.target.value;
-                setSelectedUserId(value);
-                const user = users.find((item) => String(item.id) === value);
-                setFaceCount(user?.face_count || 0);
-            }
-
-            if (!isAuthenticated) {
-                return html`
-                    <section className="auth-screen">
-                        <div className="auth-card">
-                            <h2>Login untuk Face Recognition</h2>
-                            <div className="auth-tabs">
-                                <button className=${"tab " + (authMode === 'login' ? 'tab--active' : '')} onClick=${() => { setAuthMode('login'); setAuthStatus('Masukkan email dan password untuk masuk.'); }}>
-                                    Login
-                                </button>
-                                <button className=${"tab " + (authMode === 'register' ? 'tab--active' : '')} onClick=${() => { setAuthMode('register'); setAuthStatus(''); }}>
-                                    Register
-                                </button>
-                            </div>
-
-                            <div className="input-group">
-                                ${authMode === 'register' ? html`<input value=${authName} onChange=${(event) => setAuthName(event.target.value)} placeholder="Nama lengkap" disabled=${loading.state} />` : null}
-                                <input type="email" value=${authEmail} onChange=${(event) => setAuthEmail(event.target.value)} placeholder="Email" disabled=${loading.state} />
-                                <input type="password" value=${authPassword} onChange=${(event) => setAuthPassword(event.target.value)} placeholder="Password" disabled=${loading.state} />
-                            </div>
-
-                            <button className="button button--primary" onClick=${handleAuthSubmit} disabled=${loading.state && loading.action === 'auth'} style=${ { marginTop: '1.6rem' } }>
-                                ${loading.state && loading.action === 'auth' ? (authMode === 'login' ? 'Masuk...' : 'Mendaftar...') : (authMode === 'login' ? 'Masuk Sekarang' : 'Daftar Sekarang')}
-                            </button>
-
-                            <p className="auth-note">${authStatus}</p>
-                        </div>
-                    </section>
-                `;
-            }
-
-            return html`
-                <div>
-                    <section className="hero">
-                        <div className="hero-backdrop">
-                            <div className="glass-card card-1"></div>
-                            <div className="glass-card card-2"></div>
-                            <div className="glass-card card-3"></div>
-                            <div className="glass-card card-4"></div>
-                            <span className="particle particle-1"></span>
-                            <span className="particle particle-2"></span>
-                            <span className="particle particle-3"></span>
-                            <span className="particle particle-4"></span>
-                            <span className="particle particle-5"></span>
-                        </div>
-                        <div className="hero__meta">
-                            <div className="glitter-line" />
-                            <h1 className="hero__title">Face Attendance</h1>
-                            <div className="auth-action-row" style=${ { marginTop: '1.4rem' } }>
-                                <p className="panel__text">Selamat datang, ${authUser?.name || 'pengguna'}.</p>
-                                <button className="button button--ghost" onClick=${logout}>Logout</button>
-                            </div>
-                        </div>
-                    </section>
-                    <section className="section-grid">
-                        <div className="panel">
-                            <h2 className="panel__title">Live Camera</h2>
-                            <div className="video-frame">
-                                <video ref=${videoRef} autoPlay muted playsInline />
-                                ${cameraError ? html`<div className="camera-placeholder">${cameraError}</div>` : null}
-                                ${!cameraReady && !cameraError ? html`<div className="camera-placeholder">Menunggu izin kamera...<br />Pastikan kamera diizinkan oleh browser.</div>` : null}
-                            </div>
-                            <div className="status-panel">
-                                <strong>Status</strong>
-                                <p>${result.message}</p>
-                            </div>
-                            <button
-                                className="button button--primary"
-                                disabled=${loading.state && loading.action === 'recognize'}
-                                onClick=${recognizeFace}
-                                style=${ { marginTop: '1.5rem' } }>
-                                ${loading.state && loading.action === 'recognize' ? 'Menangkap...' : 'Recognize Now'}
-                            </button>
-                        </div>
-                        <div className="controls">
-                            <div className="panel">
-                                <h2 className="panel__title">Register User</h2>
-                                <div className="input-group">
-                                    <input value=${name} onChange=${(event) => setName(event.target.value)} placeholder="Nama lengkap" disabled=${loading.state} />
-                                    <input value=${department} onChange=${(event) => setDepartment(event.target.value)} placeholder="Departemen (opsional)" disabled=${loading.state} />
-                                </div>
-                                <div className="meta-row" style=${ { marginTop: '1rem' } }>
-                                    <div className="info-card" style=${ { flex: 1 } }>
-                                        <h3>Pilih Pengguna</h3>
-                                        <div className="select-wrapper">
-                                            <select value=${selectedUserId} onChange=${handleUserChange} disabled=${loading.state}>
-                                                ${users.length === 0 ? html`<option value="">Tidak ada user</option>` : users.map((user) => html`<option key=${user.id} value=${user.id}>${user.name}</option>` ) }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <button className="button button--danger" onClick=${deleteUser} disabled=${loading.state && loading.action === 'delete'}>
-                                        ${loading.state && loading.action === 'delete' ? 'Menghapus...' : 'Delete User'}
-                                    </button>
-                                </div>
-                                <div className="meta-row" style=${ { marginTop: '1rem' } }>
-                                    <div className="glitter-pill">Face count</div>
-                                    <p style=${ { margin: 0, color: 'var(--muted)', alignSelf: 'center' } }>${faceCount} captured photos</p>
-                                </div>
-                                <div className="button-row">
-                                    <button className="button button--secondary" onClick=${registerFace} disabled=${loading.state && loading.action === 'register'}>
-                                        ${loading.state && loading.action === 'register' ? 'Capturing...' : 'Capture Face'}
-                                    </button>
-                                    <button className="button button--primary" onClick=${createUser} disabled=${loading.state && loading.action === 'create'}>
-                                        ${loading.state && loading.action === 'create' ? 'Menyimpan...' : 'Create User'}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="panel">
-                                <h2 className="panel__title">Train & Sync</h2>
-                                <p className="panel__text">${trainStatus}</p>
-                                <button className="button button--primary" onClick=${trainModel} disabled=${loading.state && loading.action === 'train'} style=${ { marginTop: '1.4rem' } }>
-                                    ${loading.state && loading.action === 'train' ? 'Training...' : 'Train Model'}
-                                </button>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            `;
+          } catch (error) {
+            setUsers([]);
+            setSelectedUserId("");
+            setFaceCount(0);
+          }
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(html`<${App} />`);
+        function getSelectedUser() {
+          return users.find(
+            (user) => String(user.id) === String(selectedUserId),
+          );
+        }
+
+        function saveAuth(user, token) {
+          setAuthUser(user);
+          setAuthToken(token);
+          setIsAuthenticated(true);
+          localStorage.setItem("face-auth-token", token);
+          localStorage.setItem("face-auth-user", JSON.stringify(user));
+        }
+
+        function clearAuth() {
+          setAuthUser(null);
+          setAuthToken("");
+          setIsAuthenticated(false);
+          localStorage.removeItem("face-auth-token");
+          localStorage.removeItem("face-auth-user");
+        }
+
+        async function handleAuthSubmit() {
+          if (
+            !authEmail.trim() ||
+            !authPassword.trim() ||
+            (authMode === "register" && !authName.trim())
+          ) {
+            setAuthStatus(
+              "Email, password, dan nama (untuk registrasi) wajib diisi.",
+            );
+            notify("Isi semua field yang dibutuhkan.", "error");
+            return;
+          }
+          setLoading({ action: "auth", state: true });
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/auth/${authMode}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: authName.trim(),
+                  email: authEmail.trim(),
+                  password: authPassword,
+                }),
+              },
+            );
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              setAuthStatus(data.message || "Gagal melakukan autentikasi.");
+              notify(data.message || "Autentikasi gagal.", "error");
+              return;
+            }
+            saveAuth(data.user, data.token);
+            setAuthStatus(
+              authMode === "login"
+                ? `Selamat datang kembali, ${data.user.name}.`
+                : `Registrasi berhasil. Selamat datang, ${data.user.name}.`,
+            );
+            notify(
+              authMode === "login" ? "Login berhasil." : "Registrasi berhasil.",
+              "success",
+            );
+          } catch (error) {
+            setAuthStatus("Tidak dapat terhubung ke server autentikasi.");
+            notify("Gagal terhubung ke server.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        function logout() {
+          clearAuth();
+          setAuthStatus("Silakan masuk atau daftar untuk melanjutkan.");
+        }
+
+        function captureFrame() {
+          const video = videoRef.current;
+          if (!video) return null;
+          const width = video.videoWidth || 640;
+          const height = video.videoHeight || 480;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.translate(width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(video, 0, 0, width, height);
+          return canvas.toDataURL("image/jpeg");
+        }
+
+        async function createUser() {
+          if (!name.trim()) {
+            notify("Nama wajib diisi.", "error");
+            return;
+          }
+          setLoading({ action: "create", state: true });
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/users`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: name.trim(),
+                  department: department.trim(),
+                  // Password tidak dikirim di sini karena ini endpoint murni untuk mendaftarkan nama/departemen user wajah baru
+                }),
+              },
+            );
+            const data = await res.json();
+            notify(`Pengguna ${data.name} berhasil dibuat.`, "success");
+            setName("");
+            setDepartment("");
+            await loadUsers();
+            setSelectedUserId(String(data.user_id));
+            setFaceCount(0);
+          } catch (error) {
+            notify("Gagal membuat pengguna.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        async function deleteUser() {
+          const user = getSelectedUser();
+          if (!user) {
+            notify("Tidak ada pengguna untuk dihapus.", "error");
+            return;
+          }
+          const confirmed = window.confirm(
+            `Hapus pengguna ${user.name} dan semua datanya?`,
+          );
+          if (!confirmed) return;
+          setLoading({ action: "delete", state: true });
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/users/${user.id}`,
+              {
+                method: "DELETE",
+              },
+            );
+            const data = await res.json();
+            if (data.success) {
+              notify(data.message, "success");
+              if (data.retrain_needed) {
+                setTrainStatus(
+                  "Pengguna dihapus. Tekan Train Model untuk memperbarui model.",
+                );
+              }
+              await loadUsers();
+            } else {
+              notify(data.message || "Gagal menghapus pengguna.", "error");
+            }
+          } catch (error) {
+            notify("Gagal menghapus pengguna.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        async function registerFace() {
+          const user = getSelectedUser();
+          if (!user) {
+            notify("Tambahkan pengguna terlebih dahulu.", "error");
+            return;
+          }
+          const image = captureFrame();
+          if (!image) {
+            notify("Kamera belum siap.", "error");
+            return;
+          }
+          setLoading({ action: "register", state: true });
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/register-face`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: user.id, image }),
+              },
+            );
+            const data = await res.json();
+            if (data.success) {
+              notify(
+                `Foto wajah ${data.name} tersimpan (#${data.face_count}).`,
+                "success",
+              );
+              setFaceCount(data.face_count);
+              setUsers((prev) =>
+                prev.map((item) =>
+                  item.id === user.id
+                    ? { ...item, face_count: data.face_count }
+                    : item,
+                ),
+              );
+            } else {
+              notify(data.message || "Gagal menyimpan wajah.", "error");
+            }
+          } catch (error) {
+            notify("Gagal menyimpan foto wajah.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        async function recognizeFace() {
+          const image = captureFrame();
+          if (!image) {
+            notify("Kamera belum siap.", "error");
+            return;
+          }
+          setLoading({ action: "recognize", state: true });
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/recognize`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image }),
+              },
+            );
+            const data = await res.json();
+            if (data.status === "recognized") {
+              setResult({
+                status: "recognized",
+                message: `${data.name} dikenali dengan confidence ${data.confidence}.`,
+              });
+              notify(`Absensi tercatat untuk ${data.name}.`, "success");
+            } else if (data.status === "no_face") {
+              setResult({
+                status: "no_face",
+                message: "Wajah tidak terdeteksi. Coba lagi.",
+              });
+              notify("Wajah tidak ditemukan.", "error");
+            } else {
+              setResult({
+                status: "unknown",
+                message: "Wajah tidak dikenali.",
+              });
+              notify("Wajah tidak dikenali.", "error");
+            }
+          } catch (error) {
+            setResult({
+              status: "error",
+              message: "Permintaan pengenalan gagal.",
+            });
+            notify("Gagal melakukan pengenalan.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        async function trainModel() {
+          setLoading({ action: "train", state: true });
+          setTrainStatus("Melatih model, tunggu sebentar...");
+          try {
+            const res = await fetch(
+              `https://attendance-face-recognition-3yy6.onrender.com/api/train`,
+              {
+                method: "POST",
+              },
+            );
+            const data = await res.json();
+            if (data.success) {
+              setTrainStatus(data.message);
+              notify(data.message, "success");
+            } else {
+              setTrainStatus(data.message || "Pelatihan gagal.");
+              notify(data.message || "Pelatihan model gagal.", "error");
+            }
+          } catch (error) {
+            setTrainStatus("Gagal melakukan pelatihan model.");
+            notify("Gagal melatih model.", "error");
+          } finally {
+            setLoading({ action: "", state: false });
+          }
+        }
+
+        function handleUserChange(event) {
+          const value = event.target.value;
+          setSelectedUserId(value);
+          const user = users.find((item) => String(item.id) === value);
+          setFaceCount(user?.face_count || 0);
+        }
+
+        if (!isAuthenticated) {
+          return html`
+            <section className="auth-screen">
+              <div className="auth-card">
+                <h2>Login untuk Face Recognition</h2>
+                <div className="auth-tabs">
+                  <button
+                    className=${"tab " +
+                    (authMode === "login" ? "tab--active" : "")}
+                    onClick=${() => {
+                      setAuthMode("login");
+                      setAuthStatus("Masukkan email dan password untuk masuk.");
+                    }}
+                  >
+                    Login
+                  </button>
+                  <button
+                    className=${"tab " +
+                    (authMode === "register" ? "tab--active" : "")}
+                    onClick=${() => {
+                      setAuthMode("register");
+                      setAuthStatus("");
+                    }}
+                  >
+                    Register
+                  </button>
+                </div>
+
+                <div className="input-group">
+                  ${authMode === "register"
+                    ? html`<input
+                        value=${authName}
+                        onChange=${(event) => setAuthName(event.target.value)}
+                        placeholder="Nama lengkap"
+                        disabled=${loading.state}
+                      />`
+                    : null}
+                  <input
+                    type="email"
+                    value=${authEmail}
+                    onChange=${(event) => setAuthEmail(event.target.value)}
+                    placeholder="Email"
+                    disabled=${loading.state}
+                  />
+                  <input
+                    type="password"
+                    value=${authPassword}
+                    onChange=${(event) => setAuthPassword(event.target.value)}
+                    placeholder="Password"
+                    disabled=${loading.state}
+                  />
+                </div>
+
+                <button
+                  className="button button--primary"
+                  onClick=${handleAuthSubmit}
+                  disabled=${loading.state && loading.action === "auth"}
+                  style=${{ marginTop: "1.6rem" }}
+                >
+                  ${loading.state && loading.action === "auth"
+                    ? authMode === "login"
+                      ? "Masuk..."
+                      : "Mendaftar..."
+                    : authMode === "login"
+                      ? "Masuk Sekarang"
+                      : "Daftar Sekarang"}
+                </button>
+
+                <p className="auth-note">${authStatus}</p>
+              </div>
+            </section>
+          `;
+        }
+
+        return html`
+          <div>
+            <section className="hero">
+              <div className="hero-backdrop">
+                <div className="glass-card card-1"></div>
+                <div className="glass-card card-2"></div>
+                <div className="glass-card card-3"></div>
+                <div className="glass-card card-4"></div>
+                <span className="particle particle-1"></span>
+                <span className="particle particle-2"></span>
+                <span className="particle particle-3"></span>
+                <span className="particle particle-4"></span>
+                <span className="particle particle-5"></span>
+              </div>
+              <div className="hero__meta">
+                <div className="glitter-line" />
+                <h1 className="hero__title">Face Attendance</h1>
+                <div
+                  className="auth-action-row"
+                  style=${{ marginTop: "1.4rem" }}
+                >
+                  <p className="panel__text">
+                    Selamat datang, ${authUser?.name || "pengguna"}.
+                  </p>
+                  <button className="button button--ghost" onClick=${logout}>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </section>
+            <section className="section-grid">
+              <div className="panel">
+                <h2 className="panel__title">Live Camera</h2>
+                <div className="video-frame">
+                  <video ref=${videoRef} autoplay muted playsinline />
+                  ${cameraError
+                    ? html`<div className="camera-placeholder">
+                        ${cameraError}
+                      </div>`
+                    : null}
+                  ${!cameraReady && !cameraError
+                    ? html`<div className="camera-placeholder">
+                        Menunggu izin kamera...<br />Pastikan kamera diizinkan
+                        oleh browser.
+                      </div>`
+                    : null}
+                </div>
+                <div className="status-panel">
+                  <strong>Status</strong>
+                  <p>${result.message}</p>
+                </div>
+                <button
+                  className="button button--primary"
+                  disabled=${loading.state && loading.action === "recognize"}
+                  onClick=${recognizeFace}
+                  style=${{ marginTop: "1.5rem" }}
+                >
+                  ${loading.state && loading.action === "recognize"
+                    ? "Menangkap..."
+                    : "Recognize Now"}
+                </button>
+              </div>
+              <div className="controls">
+                <div className="panel">
+                  <h2 className="panel__title">Register User</h2>
+                  <div className="input-group">
+                    <input
+                      value=${name}
+                      onChange=${(event) => setName(event.target.value)}
+                      placeholder="Nama lengkap"
+                      disabled=${loading.state}
+                    />
+                    <input
+                      value=${department}
+                      onChange=${(event) => setDepartment(event.target.value)}
+                      placeholder="Departemen (opsional)"
+                      disabled=${loading.state}
+                    />
+                  </div>
+                  <div className="meta-row" style=${{ marginTop: "1rem" }}>
+                    <div className="info-card" style=${{ flex: 1 }}>
+                      <h3>Pilih Pengguna</h3>
+                      <div className="select-wrapper">
+                        <select
+                          value=${selectedUserId}
+                          onChange=${handleUserChange}
+                          disabled=${loading.state}
+                        >
+                          ${users.length === 0
+                            ? html`<option value="">Tidak ada user</option>`
+                            : users.map(
+                                (user) =>
+                                  html`<option key=${user.id} value=${user.id}>
+                                    ${user.name}
+                                  </option>`,
+                              )}
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      className="button button--danger"
+                      onClick=${deleteUser}
+                      disabled=${loading.state && loading.action === "delete"}
+                    >
+                      ${loading.state && loading.action === "delete"
+                        ? "Menghapus..."
+                        : "Delete User"}
+                    </button>
+                  </div>
+                  <div className="meta-row" style=${{ marginTop: "1rem" }}>
+                    <div className="glitter-pill">Face count</div>
+                    <p
+                      style=${{
+                        margin: 0,
+                        color: "var(--muted)",
+                        alignSelf: "center",
+                      }}
+                    >
+                      ${faceCount} captured photos
+                    </p>
+                  </div>
+                  <div className="button-row">
+                    <button
+                      className="button button--secondary"
+                      onClick=${registerFace}
+                      disabled=${loading.state && loading.action === "register"}
+                    >
+                      ${loading.state && loading.action === "register"
+                        ? "Capturing..."
+                        : "Capture Face"}
+                    </button>
+                    <button
+                      className="button button--primary"
+                      onClick=${createUser}
+                      disabled=${loading.state && loading.action === "create"}
+                    >
+                      ${loading.state && loading.action === "create"
+                        ? "Menyimpan..."
+                        : "Create User"}
+                    </button>
+                  </div>
+                </div>
+                <div className="panel">
+                  <h2 className="panel__title">Train & Sync</h2>
+                  <p className="panel__text">${trainStatus}</p>
+                  <button
+                    className="button button--primary"
+                    onClick=${trainModel}
+                    disabled=${loading.state && loading.action === "train"}
+                    style=${{ marginTop: "1.4rem" }}
+                  >
+                    ${loading.state && loading.action === "train"
+                      ? "Training..."
+                      : "Train Model"}
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        `;
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(html`<${App} />`);
     </script>
-</body>
+  </body>
 </html>
