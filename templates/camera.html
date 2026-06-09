@@ -461,26 +461,50 @@
 
         .auth-tabs {
             display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
         }
 
-        .auth-tabs .tab {
-            flex: 1;
-            padding: 0.95rem 1rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            font-weight: 600;
+        .auth-tabs button.tab {
+            flex: 0 1 auto;
+            padding: 1rem 1.75rem;
+            min-width: 150px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background-color: #f7dc82 !important;
+            background-image: linear-gradient(135deg, #f7dc82 0%, #d4af37 45%, #f7dc82 100%) !important;
+            background-size: 200% 200%;
+            background-repeat: no-repeat;
+            color: #111 !important;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 0.04em;
+            text-transform: none;
+            box-shadow: 0 20px 36px rgba(212, 175, 55, 0.26);
             cursor: pointer;
-            transition: background 0.25s ease, border-color 0.25s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-clip: padding-box;
         }
 
-        .auth-tabs .tab--active {
-            background: rgba(212, 175, 55, 0.22);
-            border-color: rgba(212, 175, 55, 0.4);
-            color: #fff;
+        .auth-tabs button.tab:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 24px 42px rgba(212, 175, 55, 0.3);
+            background-color: #fff1b8 !important;
+            background-image: linear-gradient(135deg, #fff1b8 0%, #d4af37 45%, #fff1b8 100%) !important;
+        }
+
+        .auth-tabs button.tab--active {
+            background-color: #fce58b !important;
+            background-image: linear-gradient(135deg, #fce58b 0%, #d4af37 45%, #fce58b 100%) !important;
+            color: #111 !important;
+            border-color: rgba(255, 255, 255, 0.32);
+            box-shadow: 0 24px 46px rgba(212, 175, 55, 0.34);
         }
 
         .auth-note {
@@ -507,10 +531,12 @@
         }
 
         .auth-card h2 {
-            margin: 0;
+            margin: 0 0 1.2rem;
+            font-family: 'Playfair Display', serif;
             font-size: 2rem;
             color: #fff;
             letter-spacing: -0.03em;
+            text-align: center;
         }
 
         .auth-card p {
@@ -1175,10 +1201,10 @@
                         <div className="auth-card">
                             <h2>Login untuk Face Recognition</h2>
                             <div className="auth-tabs">
-                                <button className={"tab " + (authMode === 'login' ? 'tab--active' : '')} onClick=${() => { setAuthMode('login'); setAuthStatus('Masukkan email dan password untuk masuk.'); }}>
+                                <button className=${"tab " + (authMode === 'login' ? 'tab--active' : '')} onClick=${() => { setAuthMode('login'); setAuthStatus('Masukkan email dan password untuk masuk.'); }}>
                                     Login
                                 </button>
-                                <button className={"tab " + (authMode === 'register' ? 'tab--active' : '')} onClick=${() => { setAuthMode('register'); setAuthStatus('Isi detail untuk membuat akun baru.'); }}>
+                                <button className=${"tab " + (authMode === 'register' ? 'tab--active' : '')} onClick=${() => { setAuthMode('register'); setAuthStatus(''); }}>
                                     Register
                                 </button>
                             </div>
