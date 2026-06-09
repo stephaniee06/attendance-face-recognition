@@ -864,27 +864,6 @@
         color: #fff;
       }
 
-      .select-wrapper select:disabled {
-        opacity: 0.75;
-      }
-
-      .select-wrapper option,
-      option {
-        color: #f4ecd0;
-        background: #130b1f;
-      }
-
-      .select-wrapper option:hover,
-      option:hover {
-        background: rgba(212, 175, 55, 0.14);
-      }
-
-      .select-wrapper option:checked,
-      option:checked {
-        background: rgba(212, 175, 55, 0.24);
-        color: #fff;
-      }
-
       @media (max-width: 960px) {
         .hero,
         .section-grid {
@@ -935,6 +914,7 @@
     ></script>
     <script src="https://unpkg.com/htm@3.1.1/dist/htm.js" crossorigin></script>
     <script>
+      {% raw %}
       const { useEffect, useRef, useState } = React;
       const html = htm.bind(React.createElement);
       const BASE_URL = window.location.origin;
@@ -954,6 +934,14 @@
               });
               if (mounted && videoRef.current) {
                 videoRef.current.srcObject = stream;
+
+                // Memaksa video agar jalan manual setelah metadata termuat
+                videoRef.current.onloadedmetadata = () => {
+                  if (videoRef.current) {
+                    videoRef.current.play().catch(err => console.warn("Video play error:", err));
+                  }
+                };
+
                 setReady(true);
               }
             } catch (error) {
@@ -1181,7 +1169,6 @@
                 body: JSON.stringify({
                   name: name.trim(),
                   department: department.trim(),
-                  // Password tidak dikirim di sini karena ini endpoint murni untuk mendaftarkan nama/departemen user wajah baru
                 }),
               },
             );
@@ -1469,7 +1456,7 @@
               <div className="panel">
                 <h2 className="panel__title">Live Camera</h2>
                 <div className="video-frame">
-                  <video ref=${videoRef} autoplay muted playsinline />
+                  <video ref=${videoRef} autoPlay muted playsInline />
                   ${cameraError
                     ? html`<div className="camera-placeholder">
                         ${cameraError}
@@ -1599,6 +1586,7 @@
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(html`<${App} />`);
+      {% endraw %}
     </script>
   </body>
 </html>

@@ -11,9 +11,9 @@ def detect_faces(frame):
 
     faces = face_cascade.detectMultiScale(
         gray,
-        scaleFactor=1.2,
-        minNeighbors=4,
-        minSize=(80, 80)
+        scaleFactor=1.1,
+        minNeighbors=3,
+        minSize=(30, 30)
     )
 
     return faces, gray
